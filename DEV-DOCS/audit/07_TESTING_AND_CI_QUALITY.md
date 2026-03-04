@@ -1,7 +1,12 @@
 # 07 Testing and CI Quality
 
 ## Summary
-Test and CI coverage breadth is good, but local determinism and token assumptions introduce flaky outcomes.
+Coverage breadth is strong across lint, API matrix, e2e, and install scripts. Determinism has improved post-baseline, but local stale-process collisions and non-blocking e2e policy still leave residual risk.
+
+## Status Update (Post-Baseline)
+- `TST-01`: Mitigated (token-source determinism improved; fixture/process isolation still important)
+- `TST-02`: Open (BrowserStack token key naming mismatch still tracked)
+- `TST-03`: Open (e2e remains non-blocking by design)
 
 ## Findings
 
@@ -9,15 +14,17 @@ Test and CI coverage breadth is good, but local determinism and token assumption
 - ID: `TST-01`
 - Severity: `P1`
 - Impact: Local runs can fail with false negatives when provided token differs from persisted gateway config token.
-- Likelihood: High
+- Likelihood: High (baseline), Medium (current)
 - Affected files:
   - `tests/conftest.py`
   - `dashboard.py`
 - Evidence:
   - failing run: `../reports/pytest-api-isolated-2026-03-04.txt`
   - passing run: `../reports/pytest-api-isolated-tokenfile-2026-03-04.txt`
+  - passing post-remediation run: `../reports/pytest-api-isolated-devtoken-post-remediation-2026-03-04.txt`
 - Recommended fix:
-  - make fixture token source explicit and enforce a controlled startup mode for tests
+  - continue enforcing explicit isolated URL/port/token startup mode in tests
+  - add stale-process guard in test harness startup
 
 ### TST-02 BrowserStack test token key naming differs from app key naming
 - ID: `TST-02`

@@ -73,3 +73,54 @@
 
 ### Notes
 - channel endpoint failures in default runs are environment-contamination related (stale localhost server), not route-removal regressions.
+
+---
+
+## 2026-03-04 - Runtime launch UX/network binding correctness fixes
+
+### Completed
+- fixed duplicate startup summary output caused by debug reloader process behavior
+- aligned launch network hints with actual bind host resolution (`0.0.0.0` vs loopback-only modes)
+
+### Validation
+- `clawtelemetry --host 0.0.0.0 --port 8900` prints a single launch summary in effective serving process
+- Flask runtime startup logs and hint output now match the effective host binding
+
+---
+
+## 2026-03-04 - Built-in version checks and update command
+
+### Completed
+- added periodic update-check subsystem in `dashboard.py`
+  - initial check at startup
+  - refresh cadence every 24h
+  - cache file: `~/.clawtelemetry/update-state.json`
+  - opt-out env var: `CLAWTELEMETRY_DISABLE_UPDATE_CHECK=1`
+- extended `/api/overview` payload with cached `update` object
+- added Overview read-only update notice UI
+- added `clawtelemetry update` command
+  - fetches latest GitHub release
+  - installs latest archive via pip in current interpreter environment
+  - auto-restarts service when active
+
+### Validation
+- `clawtelemetry --version` -> `0.12.4`
+- `clawtelemetry update` reports up-to-date state when no newer release exists
+- overview endpoint includes `update` object without blocking on network calls
+
+---
+
+## 2026-03-04 - Branching model and CI alignment
+
+### Completed
+- standardized branch model:
+  - `main` for production
+  - `development` for integration/testing
+  - feature branches from `development`
+- updated CI trigger coverage to include pushes to both `main` and `development`
+- preserved release publishing from `main` only
+
+### Validation
+- branch state confirms `main` and `development` remotes present
+- `ci.yml` trigger includes `branches: [main, development]`
+- `publish.yml` remains constrained to pushes on `main`

@@ -61,7 +61,7 @@ except ImportError:
     metrics_service_pb2 = None
     trace_service_pb2 = None
 
-__version__ = "0.12.2"
+__version__ = "0.12.4"
 
 # Extensions (Phase 2) — load plugins at import time; safe no-op if package not installed
 try:
@@ -1514,7 +1514,7 @@ def _update_checks_disabled():
 
 
 def _normalize_version(value):
-    """Normalize release tags like 'v0.12.2' to comparable version strings."""
+    """Normalize release tags like 'v1.2.3' to comparable version strings."""
     text = str(value or "").strip()
     return text[1:] if text.startswith("v") else text
 

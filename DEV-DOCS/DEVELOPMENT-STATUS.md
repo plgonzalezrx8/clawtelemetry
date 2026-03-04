@@ -4,9 +4,9 @@
 2026-03-04
 
 ## Current Phase
-Phase: Rebrand execution (ClawTelemetry hard cut) and release pipeline migration.
+Phase: Post-rebrand stabilization, update lifecycle hardening, and documentation currency enforcement.
 
-## Completed In This Phase
+## Completed In Current Phase
 - bootstrapped full `DEV-DOCS` system
 - produced engineering-core audit dossier
 - generated reproducible evidence artifacts
@@ -16,18 +16,22 @@ Phase: Rebrand execution (ClawTelemetry hard cut) and release pipeline migration
 - added duplicate top-level definition guard (`scripts/check_dashboard_duplicates.py`) to CI lint and `make lint`
 - completed full namespace migration to `clawtelemetry` across runtime, tooling, and docs
 - switched installers and publishing flow to GitHub-only distribution
-- removed legacy alias package path under `packages/`
+- fixed duplicate startup summary output in debug reloader and aligned bind-host network launch hints
+- implemented built-in update checks (startup + 24h) with cached state at `~/.clawtelemetry/update-state.json`
+- exposed update status in `/api/overview` and Overview banner (read-only notice)
+- added `clawtelemetry update` command with GitHub Release install flow and service auto-restart path
+- aligned branch strategy to `main` (production) and `development` (integration), with CI coverage on both
 
 ## High Priority Open Items
-1. reduce broad exception swallowing in critical paths
-2. harden readiness diagnostics and auth/setup observability for operators
-3. validate first production GitHub Release artifact install across all targets
+1. reduce broad exception swallowing in critical paths and improve targeted error logs
+2. add deterministic release-install-update smoke validation in CI for latest release artifacts
+3. add long-run performance benchmark artifacts for memory/CPU over sustained sessions
 
 ## Risk Posture (Current)
-- architecture risk: medium (major duplicate-block issue remediated, single-file complexity remains)
-- security risk: medium (token/config coupling and local auth behavior complexity)
-- reliability risk: medium (startup determinism improved, global-state coupling still present)
-- release risk: low-medium (single packaging path, GitHub Release flow now canonical)
+- architecture risk: medium (single-file complexity remains; duplicate-block issue remediated)
+- security risk: medium (local token/config handling remains sensitive; controls are mostly in place)
+- reliability risk: medium (startup determinism improved; global-state coupling still present)
+- release risk: low-medium (GitHub-only path is simpler, but requires strict version/release discipline)
 
 ## Next Milestone
-Milestone: execute remaining "Now" item on targeted exception handling and complete roadmap "Next" items.
+Milestone: close `TSK-003` (exception-handling hardening) and add release-install-update end-to-end CI smoke coverage.
