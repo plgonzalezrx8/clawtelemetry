@@ -11,26 +11,36 @@ on:
 jobs:
   cross-browser:
     name: Cross-Browser Tests
-    # Forks and local-only setups typically do not have BrowserStack secrets.
-    # Skip gracefully when credentials are unavailable instead of failing main.
-    if: ${{ secrets.BROWSERSTACK_USERNAME != '' && secrets.BROWSERSTACK_ACCESS_KEY != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+      BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Skip BrowserStack run when secrets are missing
+        if: ${{ env.BROWSERSTACK_USERNAME == '' || env.BROWSERSTACK_ACCESS_KEY == '' }}
+        run: |
+          echo "BrowserStack secrets are not configured for this repository."
+          echo "Skipping BrowserStack workflow."
+
       - uses: actions/setup-python@v5
+        if: ${{ env.BROWSERSTACK_USERNAME != '' && env.BROWSERSTACK_ACCESS_KEY != '' }}
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        if: ${{ env.BROWSERSTACK_USERNAME != '' && env.BROWSERSTACK_ACCESS_KEY != '' }}
         run: pip install flask pytest pytest-playwright requests browserstack-sdk
 
       - name: Install Playwright browsers
+        if: ${{ env.BROWSERSTACK_USERNAME != '' && env.BROWSERSTACK_ACCESS_KEY != '' }}
         run: python3 -m playwright install chromium
 
       - name: Start ClawTelemetry server
+        if: ${{ env.BROWSERSTACK_USERNAME != '' && env.BROWSERSTACK_ACCESS_KEY != '' }}
         run: |
           OPENCLAW_GATEWAY_TOKEN=ci-test-token python3 dashboard.py --port 8900 --no-debug &
           for i in $(seq 1 30); do
@@ -39,21 +49,22 @@ jobs:
           done
 
       - name: Set up BrowserStack env
+        if: ${{ env.BROWSERSTACK_USERNAME != '' && env.BROWSERSTACK_ACCESS_KEY != '' }}
         uses: browserstack/github-actions/setup-env@master
         with:
-          username: ${{ secrets.BROWSERSTACK_USERNAME }}
-          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          username: ${{ env.BROWSERSTACK_USERNAME }}
+          access-key: ${{ env.BROWSERSTACK_ACCESS_KEY }}
 
       - name: Start BrowserStack Local Tunnel
+        if: ${{ env.BROWSERSTACK_USERNAME != '' && env.BROWSERSTACK_ACCESS_KEY != '' }}
         uses: browserstack/github-actions/setup-local@master
         with:
           local-testing: start
           local-identifier: clawtelemetry-${{ github.run_id }}
 
       - name: Run tests via BrowserStack SDK
+        if: ${{ env.BROWSERSTACK_USERNAME != '' && env.BROWSERSTACK_ACCESS_KEY != '' }}
         env:
-          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
-          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           BROWSERSTACK_LOCAL_IDENTIFIER: clawtelemetry-${{ github.run_id }}
           CLAWTELEMETRY_URL: http://localhost:8900
           CLAWTELEMETRY_TOKEN: ci-test-token
@@ -61,7 +72,7 @@ jobs:
           BUILD_NUMBER=${{ github.run_number }} browserstack-sdk python3 -m pytest tests/test_e2e_browserstack.py -v --tb=short
 
       - name: Stop BrowserStack Local Tunnel
-        if: always()
+        if: ${{ always() && env.BROWSERSTACK_USERNAME != '' && env.BROWSERSTACK_ACCESS_KEY != '' }}
         uses: browserstack/github-actions/setup-local@master
         with:
           local-testing: stop
