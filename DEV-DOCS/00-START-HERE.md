@@ -31,12 +31,17 @@ python3 -m py_compile dashboard.py history.py clawtelemetry/*.py clawtelemetry/p
 # API suite (isolated)
 CLAWTELEMETRY_URL=http://127.0.0.1:8924 CLAWTELEMETRY_TOKEN=<token> pytest -q tests/test_api.py -q
 
-# run server
-clawtelemetry --host 0.0.0.0 --port 8900
+# run server from source tree (no install required)
+python3 dashboard.py --host 0.0.0.0 --port 8900
 
-# check installed version and update
-clawtelemetry --version
-clawtelemetry update
+# source-tree version check/update
+python3 dashboard.py --version
+python3 dashboard.py update
+
+# installed binary equivalents
+# clawtelemetry --host 0.0.0.0 --port 8900
+# clawtelemetry --version
+# clawtelemetry update
 ```
 
 ## Operating Constraints
