@@ -8,7 +8,7 @@ $version = $env:CLAWTELEMETRY_VERSION
 $ref = $env:CLAWTELEMETRY_REF
 $installDir = if ($env:CLAWTELEMETRY_INSTALL_DIR) { $env:CLAWTELEMETRY_INSTALL_DIR } else { "$env:LOCALAPPDATA\clawtelemetry" }
 
-Write-Host "🔭 Installing ClawTelemetry from GitHub" -ForegroundColor Cyan
+Write-Host "Installing ClawTelemetry from GitHub" -ForegroundColor Cyan
 Write-Host ""
 
 # Locate Python 3.
@@ -24,17 +24,17 @@ foreach ($candidate in @("python", "python3")) {
 }
 
 if (-not $python) {
-    Write-Host "❌ Python 3 is required but was not found." -ForegroundColor Red
+    Write-Host "ERROR: Python 3 is required but was not found." -ForegroundColor Red
     exit 1
 }
 
 if (-not $version -and -not $ref) {
-    Write-Host "→ Resolving latest release tag from GitHub..."
+    Write-Host "Resolving latest release tag from GitHub..."
     try {
         $latest = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/latest"
         $version = $latest.tag_name
     } catch {
-        Write-Host "❌ Could not resolve latest release tag." -ForegroundColor Red
+        Write-Host "ERROR: Could not resolve latest release tag." -ForegroundColor Red
         Write-Host "   Set CLAWTELEMETRY_VERSION=<tag> or CLAWTELEMETRY_REF=<branch-or-sha> and retry." -ForegroundColor Red
         exit 1
     }
@@ -46,13 +46,13 @@ $archive = Join-Path $tmpDir "clawtelemetry.zip"
 
 if ($ref) {
     $archiveUrl = "https://github.com/$repo/archive/$ref.zip"
-    Write-Host "→ Installing from ref: $ref"
+    Write-Host "Installing from ref: $ref"
 } else {
     $archiveUrl = "https://github.com/$repo/archive/refs/tags/$version.zip"
-    Write-Host "→ Installing from release tag: $version"
+    Write-Host "Installing from release tag: $version"
 }
 
-Write-Host "→ Downloading source archive..."
+Write-Host "Downloading source archive..."
 if ($ref) {
     # GitHub supports SHA refs at /archive/<sha>.zip and branches at
     # /archive/refs/heads/<branch>.zip. Try both for reliability.
@@ -66,11 +66,11 @@ if ($ref) {
     Invoke-WebRequest -Uri $archiveUrl -OutFile $archive
 }
 
-Write-Host "→ Extracting archive..."
+Write-Host "Extracting archive..."
 Expand-Archive -Path $archive -DestinationPath $tmpDir -Force
 $srcDir = Get-ChildItem -Path $tmpDir -Directory | Select-Object -First 1
 if (-not $srcDir) {
-    Write-Host "❌ Failed to locate extracted source directory." -ForegroundColor Red
+    Write-Host "ERROR: Failed to locate extracted source directory." -ForegroundColor Red
     exit 1
 }
 
@@ -78,18 +78,18 @@ if (Test-Path $installDir) {
     Remove-Item -Recurse -Force $installDir
 }
 
-Write-Host "→ Creating virtual environment at $installDir..."
+Write-Host "Creating virtual environment at $installDir..."
 & $python -m venv $installDir
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Failed to create virtual environment." -ForegroundColor Red
+    Write-Host "ERROR: Failed to create virtual environment." -ForegroundColor Red
     exit 1
 }
 
 & "$installDir\Scripts\pip.exe" install --upgrade pip | Out-Null
-Write-Host "→ Installing ClawTelemetry from local source archive"
+Write-Host "Installing ClawTelemetry from local source archive"
 & "$installDir\Scripts\pip.exe" install --no-cache-dir $srcDir.FullName | Out-Null
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "❌ Failed to install ClawTelemetry from GitHub source." -ForegroundColor Red
+    Write-Host "ERROR: Failed to install ClawTelemetry from GitHub source." -ForegroundColor Red
     exit 1
 }
 
@@ -104,7 +104,7 @@ $env:PATH = "$binDir;$env:PATH"
 $versionOutput = & "$binDir\clawtelemetry.exe" --version 2>&1
 
 Write-Host ""
-Write-Host "✅ ClawTelemetry installed successfully" -ForegroundColor Green
+Write-Host "ClawTelemetry installed successfully" -ForegroundColor Green
 Write-Host "  Version: $versionOutput"
 Write-Host ""
 Write-Host "  Run: clawtelemetry --host 0.0.0.0 --port 8900"
