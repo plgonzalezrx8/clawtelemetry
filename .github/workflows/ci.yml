@@ -68,11 +68,15 @@ jobs:
 
       - name: Start server (Windows)
         if: runner.os == 'Windows'
+        timeout-minutes: 3
         run: |
           $env:OPENCLAW_GATEWAY_TOKEN = "ci-test-token"
           $env:PYTHONIOENCODING = "utf-8"
           $env:PYTHONUTF8 = "1"
-          Start-Process python -ArgumentList "-u -X utf8 dashboard.py --port 8900 --no-debug" -NoNewWindow -RedirectStandardOutput "server_out.txt" -RedirectStandardError "server_err.txt"
+          # Use a detached process without output redirection to avoid occasional
+          # Windows runner hangs when Start-Process is combined with redirection.
+          $proc = Start-Process python -ArgumentList "-u -X utf8 dashboard.py --port 8900 --no-debug" -PassThru
+          Write-Host "Started dashboard process pid=$($proc.Id)"
           $ready = $false
           for ($i = 0; $i -lt 30; $i++) {
             try {
@@ -83,10 +87,8 @@ jobs:
             Start-Sleep 1
           }
           if (-not $ready) {
-            Write-Host "=== server_out.txt ===" 
-            if (Test-Path server_out.txt) { Get-Content server_out.txt }
-            Write-Host "=== server_err.txt ==="
-            if (Test-Path server_err.txt) { Get-Content server_err.txt }
+            Write-Host "Dashboard process status:"
+            Get-Process -Id $proc.Id -ErrorAction SilentlyContinue | Format-List -Property Id,ProcessName,StartTime
             Write-Error "Server failed to start"; exit 1
           }
         shell: pwsh
