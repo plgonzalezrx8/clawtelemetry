@@ -1,8 +1,29 @@
-# ClawTelemetry
+<p align="center">
+  <img src=".github/branding/clawtelemetry-logo.webp" alt="ClawTelemetry Logo" width="320" />
+</p>
 
-Real-time observability dashboard for OpenClaw agents.
+<h1 align="center">ClawTelemetry</h1>
 
-ClawTelemetry stays zero-config by default: run it, point your browser to `http://localhost:8900`, and inspect live activity across sessions, channels, logs, usage, and memory.
+<p align="center"><strong>See your OpenClaw agents think, in real time.</strong></p>
+
+<p align="center">
+  Real-time observability for sessions, channels, usage, memory, logs, and flow behavior.
+</p>
+
+<p align="center">
+  <a href="https://github.com/plgonzalezrx8/clawtelemetry/actions/workflows/ci.yml"><img src="https://github.com/plgonzalezrx8/clawtelemetry/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/plgonzalezrx8/clawtelemetry/releases"><img src="https://img.shields.io/github/v/release/plgonzalezrx8/clawtelemetry" alt="Latest Release" /></a>
+  <a href="https://github.com/plgonzalezrx8/clawtelemetry/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT License" /></a>
+</p>
+
+![ClawTelemetry Hero](.github/branding/clawtelemetry-hero.webp)
+
+## Why ClawTelemetry
+
+- Zero-config startup on local machines
+- Unified operational visibility across your OpenClaw runtime
+- Lightweight architecture (single-file dashboard, no frontend build chain)
+- Works well for local development and LAN dashboards
 
 ## Install (GitHub-only)
 
@@ -30,6 +51,10 @@ curl -fsSL https://raw.githubusercontent.com/plgonzalezrx8/clawtelemetry/main/in
 clawtelemetry --host 0.0.0.0 --port 8900
 ```
 
+Open:
+- `http://localhost:8900`
+- `http://<your-lan-ip>:8900` (if LAN access is enabled and your firewall allows it)
+
 Common options:
 
 ```bash
@@ -45,10 +70,9 @@ clawtelemetry --name "Alice"
 clawtelemetry update
 ```
 
-- Updates to the latest GitHub Release.
-- If a background ClawTelemetry service is running, it is restarted automatically after a successful update.
-- If install permissions fail, rerun the command with the Python environment that owns your current `clawtelemetry` binary.
-- Optional for CI/offline: set `CLAWTELEMETRY_DISABLE_UPDATE_CHECK=1` to disable automatic background update checks.
+- Pulls the latest GitHub Release.
+- Automatically restarts a running background ClawTelemetry service after successful update.
+- For CI/offline environments, disable periodic checks with `CLAWTELEMETRY_DISABLE_UPDATE_CHECK=1`.
 
 ## From Source
 
@@ -58,15 +82,16 @@ cd clawtelemetry
 python3 dashboard.py --host 0.0.0.0 --port 8900
 ```
 
-## What You Get
+## Dashboard Views
 
-- Flow visualization for agent/channel interactions
-- Overview health and activity status
-- Usage and cost telemetry
-- Sessions and transcript inspection
-- Cron status and execution history
-- Real-time logs
-- Memory browser (SOUL.md, MEMORY.md, AGENTS.md, notes)
+- Overview
+- Usage
+- Sessions
+- Crons
+- Logs
+- Memory
+- Transcripts
+- Flow
 
 ## Screenshots
 
@@ -81,9 +106,10 @@ python3 dashboard.py --host 0.0.0.0 --port 8900
 ## Docs
 
 - Architecture: [ARCHITECTURE.md](ARCHITECTURE.md)
-- Cloud and remote access notes: [docs/CLOUD_TESTING.md](docs/CLOUD_TESTING.md)
+- Cloud and remote-access notes: [docs/CLOUD_TESTING.md](docs/CLOUD_TESTING.md)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Security policy: [SECURITY.md](SECURITY.md)
+- Internal engineering docs: [DEV-DOCS/README.md](DEV-DOCS/README.md)
 
 ## License
 
