@@ -2,6 +2,7 @@
 setlocal
 REM ClawTelemetry installer for Windows (CMD)
 REM Uses the PowerShell installer to keep one canonical implementation.
+REM PATH verification happens in CI after install using LOCALAPPDATA\\clawtelemetry\\Scripts.
 REM Usage: curl -fsSL https://raw.githubusercontent.com/plgonzalezrx8/clawtelemetry/main/install.cmd -o install.cmd && install.cmd && del install.cmd
 
 echo.
