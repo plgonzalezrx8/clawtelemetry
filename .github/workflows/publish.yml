@@ -2,13 +2,13 @@ name: Publish GitHub Release
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g. 1.2.3 or v1.2.3)'
-        required: true
+        description: 'Optional version to publish (e.g. 1.2.3 or v1.2.3). Defaults to dashboard.py version.'
+        required: false
 
 jobs:
   release:
@@ -22,47 +22,70 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Resolve release tag
-        id: tag
+      - name: Resolve release tag and release eligibility
+        id: prep
         shell: bash
         run: |
-          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
-            TAG="${GITHUB_REF#refs/tags/}"
-          else
+          DASHBOARD_VERSION=$(python3 -c "import re;print(re.search(r'__version__\s*=\s*\"(.+?)\"', open('dashboard.py', encoding='utf-8').read()).group(1))")
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
             RAW="${{ github.event.inputs.version }}"
             if [[ "$RAW" == v* ]]; then
               TAG="$RAW"
             else
               TAG="v$RAW"
             fi
+          else
+            TAG="v${DASHBOARD_VERSION}"
           fi
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "Resolved tag: $TAG"
 
-      - name: Verify dashboard version matches tag
-        shell: bash
-        run: |
-          TAG="${{ steps.tag.outputs.tag }}"
           TAG_VERSION="${TAG#v}"
-          DASHBOARD_VERSION=$(python3 -c "import re;print(re.search(r'__version__\s*=\s*\"(.+?)\"', open('dashboard.py', encoding='utf-8').read()).group(1))")
-          echo "Tag: $TAG | dashboard.py version: $DASHBOARD_VERSION"
           if [ "$TAG_VERSION" != "$DASHBOARD_VERSION" ]; then
             echo "Version mismatch: tag=$TAG_VERSION dashboard=$DASHBOARD_VERSION"
+            echo "Bump dashboard.py __version__ before merging to main, or dispatch with matching --version."
             exit 1
           fi
 
-      - name: Build source archive and checksums
+          TAG_EXISTS="false"
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            TAG_EXISTS="true"
+          fi
+
+          SHOULD_RELEASE="true"
+          # On every main merge, publish only once per dashboard version.
+          if [ "${GITHUB_EVENT_NAME}" = "push" ] && [ "${TAG_EXISTS}" = "true" ]; then
+            SHOULD_RELEASE="false"
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "dashboard_version=$DASHBOARD_VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag_exists=$TAG_EXISTS" >> "$GITHUB_OUTPUT"
+          echo "should_release=$SHOULD_RELEASE" >> "$GITHUB_OUTPUT"
+          echo "Resolved tag: $TAG"
+          echo "dashboard.py version: $DASHBOARD_VERSION"
+          echo "Tag exists: $TAG_EXISTS"
+          echo "Should release: $SHOULD_RELEASE"
+
+      - name: Skip notice (tag already released)
+        if: steps.prep.outputs.should_release != 'true'
         shell: bash
         run: |
-          TAG="${{ steps.tag.outputs.tag }}"
+          echo "Release skipped: tag ${{ steps.prep.outputs.tag }} already exists."
+          echo "To publish a new release from main, bump dashboard.py __version__ and merge again."
+
+      - name: Build source archive and checksums
+        if: steps.prep.outputs.should_release == 'true'
+        shell: bash
+        run: |
+          TAG="${{ steps.prep.outputs.tag }}"
           ARCHIVE="clawtelemetry-${TAG}.tar.gz"
           git archive --format=tar.gz --prefix="clawtelemetry-${TAG#v}/" -o "$ARCHIVE" HEAD
           sha256sum install.sh install.ps1 install.cmd "$ARCHIVE" > checksums.txt
 
       - name: Publish GitHub release
+        if: steps.prep.outputs.should_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
+          tag_name: ${{ steps.prep.outputs.tag }}
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           files: |
