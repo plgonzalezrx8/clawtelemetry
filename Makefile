@@ -16,4 +16,5 @@ test-e2e:
 
 lint:
 	python3 -c "import ast; ast.parse(open('dashboard.py').read()); print('Syntax OK')"
+	python3 scripts/check_dashboard_duplicates.py dashboard.py
 	ruff check dashboard.py || true

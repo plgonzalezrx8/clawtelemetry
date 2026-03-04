@@ -1,0 +1,126 @@
+TODO/FIXME/HACK markers:
+dashboard.py:13130:  // Support ?token=XXX in URL — auto-configure and strip from address bar
+dashboard.py:13713:    """Accept ?token=XXX, store in localStorage via JS, redirect to /.
+dashboard.py:14079:    # TODO: integrate with AI agent messaging system
+
+Broad exception/pass hotspots (first 120):
+history.py:224:                pass
+history.py:301:            except Exception as e:
+history.py:308:                except Exception as e:
+history.py:351:                        pass
+dashboard.py:27:    except Exception:
+dashboard.py:28:        pass
+dashboard.py:89:        pass
+dashboard.py:196:            pass
+dashboard.py:199:    except Exception as e:
+dashboard.py:226:    except Exception as e:
+dashboard.py:253:        except Exception:
+dashboard.py:254:            pass
+dashboard.py:268:        except Exception as e:
+dashboard.py:378:        except Exception as e:
+dashboard.py:455:                        pass
+dashboard.py:458:    except Exception:
+dashboard.py:459:        pass
+dashboard.py:574:        pass
+dashboard.py:585:        except Exception:
+dashboard.py:586:            pass
+dashboard.py:597:        pass
+dashboard.py:607:        except Exception:
+dashboard.py:608:            pass
+dashboard.py:641:    except Exception as e:
+dashboard.py:673:    except Exception as e:
+dashboard.py:681:    except Exception:
+dashboard.py:682:        pass
+dashboard.py:692:    except Exception:
+dashboard.py:693:        pass
+dashboard.py:704:    except Exception:
+dashboard.py:719:    except Exception:
+dashboard.py:736:    except Exception:
+dashboard.py:819:                    except Exception:
+dashboard.py:820:                        pass
+dashboard.py:831:        except Exception as e:
+dashboard.py:1099:    except Exception as e:
+dashboard.py:1162:    except Exception:
+dashboard.py:1163:        pass
+dashboard.py:1193:            except Exception:
+dashboard.py:1194:                pass
+dashboard.py:1195:    except Exception:
+dashboard.py:1196:        pass
+dashboard.py:1304:    except Exception:
+dashboard.py:1305:        pass
+dashboard.py:1322:            pass
+dashboard.py:1334:            pass
+dashboard.py:1352:            pass
+dashboard.py:1369:            pass
+dashboard.py:1393:                    pass
+dashboard.py:1394:    except Exception:
+dashboard.py:1395:        pass
+dashboard.py:1413:            pass
+dashboard.py:1432:        pass
+dashboard.py:1441:    except Exception:
+dashboard.py:1457:    except Exception as e:
+dashboard.py:4286:        pass
+dashboard.py:4393:            pass
+dashboard.py:4396:    except Exception as e:
+dashboard.py:4423:    except Exception as e:
+dashboard.py:4450:        except Exception:
+dashboard.py:4451:            pass
+dashboard.py:4465:        except Exception as e:
+dashboard.py:4575:        except Exception as e:
+dashboard.py:4652:                        pass
+dashboard.py:4655:    except Exception:
+dashboard.py:4656:        pass
+dashboard.py:4771:        pass
+dashboard.py:4782:        except Exception:
+dashboard.py:4783:            pass
+dashboard.py:4794:        pass
+dashboard.py:4804:        except Exception:
+dashboard.py:4805:            pass
+dashboard.py:4838:    except Exception as e:
+dashboard.py:4870:    except Exception as e:
+dashboard.py:4878:    except Exception:
+dashboard.py:4879:        pass
+dashboard.py:4889:    except Exception:
+dashboard.py:4890:        pass
+dashboard.py:4901:    except Exception:
+dashboard.py:4916:    except Exception:
+dashboard.py:4933:    except Exception:
+dashboard.py:5016:                    except Exception:
+dashboard.py:5017:                        pass
+dashboard.py:5028:        except Exception as e:
+dashboard.py:5296:    except Exception as e:
+dashboard.py:5359:    except Exception:
+dashboard.py:5360:        pass
+dashboard.py:5390:            except Exception:
+dashboard.py:5391:                pass
+dashboard.py:5392:    except Exception:
+dashboard.py:5393:        pass
+dashboard.py:5535:            pass
+dashboard.py:5547:            pass
+dashboard.py:5565:            pass
+dashboard.py:5582:            pass
+dashboard.py:5606:                    pass
+dashboard.py:5607:    except Exception:
+dashboard.py:5608:        pass
+dashboard.py:5626:            pass
+dashboard.py:5645:        pass
+dashboard.py:5654:    except Exception:
+dashboard.py:5670:    except Exception as e:
+dashboard.py:13322:    except Exception:
+dashboard.py:13323:        pass
+dashboard.py:13346:        except Exception:
+dashboard.py:13351:            except Exception:
+dashboard.py:13352:                pass
+dashboard.py:13370:    except Exception:
+dashboard.py:13371:        pass
+dashboard.py:13406:        except Exception:
+dashboard.py:13407:            pass
+dashboard.py:13438:    except Exception:
+dashboard.py:13439:        pass
+dashboard.py:13513:            except Exception:
+dashboard.py:13514:                pass
+dashboard.py:13529:            except Exception:
+dashboard.py:13530:                pass
+dashboard.py:13551:        except Exception:
+dashboard.py:13552:            pass
+dashboard.py:13600:            pass

@@ -1,0 +1,2213 @@
+EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE                       [100%]
+==================================== ERRORS ====================================
+____________ ERROR at setup of TestAuth.test_auth_check_accessible _____________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_______________ ERROR at setup of TestAuth.test_auth_with_token ________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+__________________ ERROR at setup of TestOverview.test_status __________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+______________ ERROR at setup of TestOverview.test_required_keys _______________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_____________ ERROR at setup of TestOverview.test_model_is_string ______________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+__________ ERROR at setup of TestOverview.test_main_tokens_is_number ___________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+__________________ ERROR at setup of TestChannels.test_status __________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+__________ ERROR at setup of TestChannels.test_returns_channels_list ___________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+___________________ ERROR at setup of TestHealth.test_status ___________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_________________ ERROR at setup of TestHealth.test_has_checks _________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+________________ ERROR at setup of TestSystemHealth.test_status ________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+___________ ERROR at setup of TestSystemHealth.test_response_is_dict ___________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+__________________ ERROR at setup of TestSessions.test_status __________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_________ ERROR at setup of TestSessions.test_response_is_list_or_dict _________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+___________________ ERROR at setup of TestCrons.test_status ____________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+__________ ERROR at setup of TestCrons.test_response_is_list_or_dict ___________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+________________ ERROR at setup of TestTranscripts.test_status _________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_______ ERROR at setup of TestTranscripts.test_response_is_list_or_dict ________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+___________________ ERROR at setup of TestUsage.test_status ____________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+______________ ERROR at setup of TestUsage.test_response_is_dict _______________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_________________ ERROR at setup of TestSubagents.test_status __________________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+________ ERROR at setup of TestSubagents.test_response_is_list_or_dict _________
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_status[telegram-required_keys0] __
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_status[imessage-required_keys1] __
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_status[whatsapp-required_keys2] __
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+__ ERROR at setup of TestChannelEndpoints.test_status[signal-required_keys3] ___
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+__ ERROR at setup of TestChannelEndpoints.test_status[discord-required_keys4] __
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+___ ERROR at setup of TestChannelEndpoints.test_status[slack-required_keys5] ___
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+__ ERROR at setup of TestChannelEndpoints.test_status[webchat-required_keys6] __
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_required_keys[telegram-required_keys0] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_required_keys[imessage-required_keys1] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_required_keys[whatsapp-required_keys2] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_required_keys[signal-required_keys3] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_required_keys[discord-required_keys4] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_required_keys[slack-required_keys5] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_required_keys[webchat-required_keys6] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_messages_is_list[telegram-required_keys0] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_messages_is_list[imessage-required_keys1] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_messages_is_list[whatsapp-required_keys2] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_messages_is_list[signal-required_keys3] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_messages_is_list[discord-required_keys4] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_messages_is_list[slack-required_keys5] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_messages_is_list[webchat-required_keys6] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_today_counts_are_numbers[telegram-required_keys0] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_today_counts_are_numbers[imessage-required_keys1] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_today_counts_are_numbers[whatsapp-required_keys2] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_today_counts_are_numbers[signal-required_keys3] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_today_counts_are_numbers[discord-required_keys4] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_today_counts_are_numbers[slack-required_keys5] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+_ ERROR at setup of TestChannelEndpoints.test_today_counts_are_numbers[webchat-required_keys6] _
+
+base_url = 'http://127.0.0.1:8911', token = 'dev-token'
+
+    @pytest.fixture(scope="session", autouse=True)
+    def server(base_url, token):
+        """Ensure the ClawMetry server is running before tests."""
+        if _is_server_running(base_url, token):
+            yield base_url
+            return
+    
+        # Start the server
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dashboard = os.path.join(repo_root, "dashboard.py")
+        env = os.environ.copy()
+        # Propagate the CI test token so the server accepts our requests
+        if token:
+            env["OPENCLAW_GATEWAY_TOKEN"] = token
+        # Derive port from base_url
+        try:
+            port = base_url.split(":")[-1].rstrip("/")
+        except Exception:
+            port = "8900"
+        proc = subprocess.Popen(
+            [sys.executable, dashboard, "--port", port, "--no-debug"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+    
+        # Wait up to 20 seconds for the server to be ready
+        for _ in range(40):
+            time.sleep(0.5)
+            if _is_server_running(base_url, token):
+                break
+        else:
+            stderr_out = proc.stderr.read(2000) if proc.stderr else b""
+            proc.terminate()
+>           pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+E           Failed: ClawMetry server failed to start. stderr: Address already in use
+E           Port 8911 is in use by another program. Either identify and stop that program, or start the server with a different port.
+
+tests/conftest.py:103: Failed
+=============================== warnings summary ===============================
+../../../../Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/__init__.py:113
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (6.0.0.post1)/charset_normalizer (3.4.4) doesn't match a supported version!
+    warnings.warn(
+
+tests/test_api.py::TestAuth::test_auth_check_accessible
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pytest_asyncio/plugin.py:1190: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    return asyncio.get_event_loop_policy()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_api.py::TestAuth::test_auth_check_accessible - Failed: ClawM...
+ERROR tests/test_api.py::TestAuth::test_auth_with_token - Failed: ClawMetry s...
+ERROR tests/test_api.py::TestOverview::test_status - Failed: ClawMetry server...
+ERROR tests/test_api.py::TestOverview::test_required_keys - Failed: ClawMetry...
+ERROR tests/test_api.py::TestOverview::test_model_is_string - Failed: ClawMet...
+ERROR tests/test_api.py::TestOverview::test_main_tokens_is_number - Failed: C...
+ERROR tests/test_api.py::TestChannels::test_status - Failed: ClawMetry server...
+ERROR tests/test_api.py::TestChannels::test_returns_channels_list - Failed: C...
+ERROR tests/test_api.py::TestHealth::test_status - Failed: ClawMetry server f...
+ERROR tests/test_api.py::TestHealth::test_has_checks - Failed: ClawMetry serv...
+ERROR tests/test_api.py::TestSystemHealth::test_status - Failed: ClawMetry se...
+ERROR tests/test_api.py::TestSystemHealth::test_response_is_dict - Failed: Cl...
+ERROR tests/test_api.py::TestSessions::test_status - Failed: ClawMetry server...
+ERROR tests/test_api.py::TestSessions::test_response_is_list_or_dict - Failed...
+ERROR tests/test_api.py::TestCrons::test_status - Failed: ClawMetry server fa...
+ERROR tests/test_api.py::TestCrons::test_response_is_list_or_dict - Failed: C...
+ERROR tests/test_api.py::TestTranscripts::test_status - Failed: ClawMetry ser...
+ERROR tests/test_api.py::TestTranscripts::test_response_is_list_or_dict - Fai...
+ERROR tests/test_api.py::TestUsage::test_status - Failed: ClawMetry server fa...
+ERROR tests/test_api.py::TestUsage::test_response_is_dict - Failed: ClawMetry...
+ERROR tests/test_api.py::TestSubagents::test_status - Failed: ClawMetry serve...
+ERROR tests/test_api.py::TestSubagents::test_response_is_list_or_dict - Faile...
+ERROR tests/test_api.py::TestChannelEndpoints::test_status[telegram-required_keys0]
+ERROR tests/test_api.py::TestChannelEndpoints::test_status[imessage-required_keys1]
+ERROR tests/test_api.py::TestChannelEndpoints::test_status[whatsapp-required_keys2]
+ERROR tests/test_api.py::TestChannelEndpoints::test_status[signal-required_keys3]
+ERROR tests/test_api.py::TestChannelEndpoints::test_status[discord-required_keys4]
+ERROR tests/test_api.py::TestChannelEndpoints::test_status[slack-required_keys5]
+ERROR tests/test_api.py::TestChannelEndpoints::test_status[webchat-required_keys6]
+ERROR tests/test_api.py::TestChannelEndpoints::test_required_keys[telegram-required_keys0]
+ERROR tests/test_api.py::TestChannelEndpoints::test_required_keys[imessage-required_keys1]
+ERROR tests/test_api.py::TestChannelEndpoints::test_required_keys[whatsapp-required_keys2]
+ERROR tests/test_api.py::TestChannelEndpoints::test_required_keys[signal-required_keys3]
+ERROR tests/test_api.py::TestChannelEndpoints::test_required_keys[discord-required_keys4]
+ERROR tests/test_api.py::TestChannelEndpoints::test_required_keys[slack-required_keys5]
+ERROR tests/test_api.py::TestChannelEndpoints::test_required_keys[webchat-required_keys6]
+ERROR tests/test_api.py::TestChannelEndpoints::test_messages_is_list[telegram-required_keys0]
+ERROR tests/test_api.py::TestChannelEndpoints::test_messages_is_list[imessage-required_keys1]
+ERROR tests/test_api.py::TestChannelEndpoints::test_messages_is_list[whatsapp-required_keys2]
+ERROR tests/test_api.py::TestChannelEndpoints::test_messages_is_list[signal-required_keys3]
+ERROR tests/test_api.py::TestChannelEndpoints::test_messages_is_list[discord-required_keys4]
+ERROR tests/test_api.py::TestChannelEndpoints::test_messages_is_list[slack-required_keys5]
+ERROR tests/test_api.py::TestChannelEndpoints::test_messages_is_list[webchat-required_keys6]
+ERROR tests/test_api.py::TestChannelEndpoints::test_today_counts_are_numbers[telegram-required_keys0]
+ERROR tests/test_api.py::TestChannelEndpoints::test_today_counts_are_numbers[imessage-required_keys1]
+ERROR tests/test_api.py::TestChannelEndpoints::test_today_counts_are_numbers[whatsapp-required_keys2]
+ERROR tests/test_api.py::TestChannelEndpoints::test_today_counts_are_numbers[signal-required_keys3]
+ERROR tests/test_api.py::TestChannelEndpoints::test_today_counts_are_numbers[discord-required_keys4]
+ERROR tests/test_api.py::TestChannelEndpoints::test_today_counts_are_numbers[slack-required_keys5]
+ERROR tests/test_api.py::TestChannelEndpoints::test_today_counts_are_numbers[webchat-required_keys6]

@@ -17,6 +17,8 @@ jobs:
           python-version: "3.11"
       - name: Check Python syntax
         run: python3 -c "import ast; ast.parse(open('dashboard.py').read()); print('✅ Syntax OK')"
+      - name: Check duplicate top-level definitions
+        run: python3 scripts/check_dashboard_duplicates.py dashboard.py
       - name: Install ruff (fast linter)
         run: pip install ruff
       - name: Lint (warnings only, don't fail)

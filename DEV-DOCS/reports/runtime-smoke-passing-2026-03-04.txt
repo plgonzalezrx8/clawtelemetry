@@ -1,0 +1,15 @@
+PORT=8925
+TOKEN_PREFIX=601ea9
+
+AUTH_CHECK:
+{"authRequired":true,"valid":false}
+
+HEALTH_STATUS:
+200
+HEALTH_BODY:
+{"checks":[{"color":"green","detail":"Port 18789 responding","id":"gateway","status":"healthy"},{"color":"green","detail":"27.6 GB free (88% used)","id":"disk","status":"healthy"},{"color":"yellow","detail":"Check failed","id":"memory","status":"warning"},{"color":"green","detail":"","id":"uptime","status":"healthy"},{"color":"yellow","detail":"OTLP ready - no data received yet","id":"otel","status":"warning"}]}
+
+OVERVIEW_STATUS:
+200
+OVERVIEW_BODY_SNIPPET:
+{"contextWindow":200000,"cronCount":13,"cronDisabled":2,"cronEnabled":11,"infra":{"machine":"Pedros-Mac-mini.local","network":"192.168.1.207","runtime":"Node.js - Darwin 25.3.0","storage":"228Gi root","userName":"You"},"mainSessionUpdated":1772630540257,"mainTokens":32836,"memoryCount":56,"memorySize":318355,"model":"gpt-5.2","provider":"openai","sessionCount":5,"system":[["Disk /","11Gi / 228Gi (
