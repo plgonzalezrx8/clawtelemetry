@@ -1472,6 +1472,297 @@ def get_local_ip():
         return "127.0.0.1"
 
 
+# ── Update Check / Self-Update ───────────────────────────────────────────
+
+UPDATE_REPO = "plgonzalezrx8/clawtelemetry"
+UPDATE_RELEASE_API = f"https://api.github.com/repos/{UPDATE_REPO}/releases/latest"
+UPDATE_CHECK_INTERVAL_SECONDS = 24 * 60 * 60
+UPDATE_TIMEOUT_SECONDS = 4
+UPDATE_CACHE_FILE = os.path.expanduser("~/.clawtelemetry/update-state.json")
+
+_UPDATE_STATE_LOCK = threading.Lock()
+_UPDATE_CHECKER_STARTED = False
+_UPDATE_LAST_NOTIFIED_TAG = ""
+
+
+def _utcnow_iso():
+    """Return current UTC time in an API-friendly ISO-8601 format."""
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _default_update_state():
+    """Base update-state schema used by cache, API, and CLI output."""
+    return {
+        "current_version": __version__,
+        "latest_tag": "",
+        "latest_version": "",
+        "update_available": False,
+        "checked_at": "",
+        "release_url": "",
+        "archive_url": "",
+        "last_error": "",
+    }
+
+
+_UPDATE_STATE = _default_update_state()
+
+
+def _update_checks_disabled():
+    """Allow CI/offline users to disable automatic background update checks."""
+    raw = os.environ.get("CLAWTELEMETRY_DISABLE_UPDATE_CHECK", "").strip().lower()
+    return raw in ("1", "true", "yes", "on")
+
+
+def _normalize_version(value):
+    """Normalize release tags like 'v0.12.2' to comparable version strings."""
+    text = str(value or "").strip()
+    return text[1:] if text.startswith("v") else text
+
+
+def _version_tuple(value):
+    """Convert a semantic-ish version string into an integer tuple for comparison."""
+    version_text = _normalize_version(value)
+    if not version_text:
+        return None
+    parts = []
+    for chunk in version_text.split("."):
+        m = _re.match(r"^(\d+)", chunk.strip())
+        if not m:
+            return None
+        parts.append(int(m.group(1)))
+    return tuple(parts)
+
+
+def _is_newer_version(latest, current):
+    """Return True only when latest is confidently newer than current."""
+    latest_tuple = _version_tuple(latest)
+    current_tuple = _version_tuple(current)
+    if latest_tuple is None or current_tuple is None:
+        # Safe fallback: if parsing fails, avoid claiming an update.
+        return False
+    width = max(len(latest_tuple), len(current_tuple))
+    latest_tuple = latest_tuple + (0,) * (width - len(latest_tuple))
+    current_tuple = current_tuple + (0,) * (width - len(current_tuple))
+    return latest_tuple > current_tuple
+
+
+def _parse_iso_utc(value):
+    """Parse a persisted ISO timestamp into a datetime in UTC."""
+    if not value:
+        return None
+    text = str(value).strip()
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        parsed = datetime.fromisoformat(text)
+        if parsed.tzinfo is None:
+            return parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc)
+    except Exception:
+        return None
+
+
+def _read_update_cache():
+    """Read cached update state from disk; return None on invalid/missing cache."""
+    try:
+        with open(UPDATE_CACHE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            return data
+    except Exception:
+        pass
+    return None
+
+
+def _save_update_cache(state):
+    """Persist update state for fast startup/status when offline."""
+    try:
+        os.makedirs(os.path.dirname(UPDATE_CACHE_FILE), exist_ok=True)
+        with open(UPDATE_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(state, f, indent=2)
+    except Exception:
+        # Cache writes are best-effort and must never block runtime behavior.
+        pass
+
+
+def _merge_update_state(partial_state):
+    """Update in-memory state under lock and return a stable snapshot."""
+    with _UPDATE_STATE_LOCK:
+        _UPDATE_STATE.update(partial_state)
+        return dict(_UPDATE_STATE)
+
+
+def _get_update_state_snapshot():
+    """Return a lock-protected copy of the in-memory update state."""
+    with _UPDATE_STATE_LOCK:
+        return dict(_UPDATE_STATE)
+
+
+def _load_update_state_from_cache():
+    """Bootstrap in-memory update state from last known cache contents."""
+    cached = _read_update_cache()
+    if not cached:
+        return _get_update_state_snapshot()
+
+    base = _default_update_state()
+    for key in base.keys():
+        if key == "current_version":
+            continue
+        if key in cached:
+            base[key] = cached.get(key)
+    base["current_version"] = _normalize_version(__version__)
+    return _merge_update_state(base)
+
+
+def _fetch_latest_release_payload(timeout=UPDATE_TIMEOUT_SECONDS):
+    """Fetch latest GitHub release metadata for ClawTelemetry."""
+    import urllib.request as _urllib_request
+    import urllib.error as _urllib_error
+
+    req = _urllib_request.Request(
+        UPDATE_RELEASE_API,
+        headers={
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "clawtelemetry-update-check",
+        },
+        method="GET",
+    )
+    try:
+        with _urllib_request.urlopen(req, timeout=timeout) as resp:
+            body = resp.read().decode("utf-8", errors="replace")
+        data = json.loads(body)
+        if not isinstance(data, dict):
+            raise RuntimeError("Invalid response while reading latest release metadata.")
+        return data
+    except _urllib_error.HTTPError as e:
+        raise RuntimeError(f"GitHub release API returned HTTP {e.code}.")
+    except _urllib_error.URLError as e:
+        raise RuntimeError(f"GitHub release check failed: {e.reason}.")
+
+
+def _build_update_state_from_release(payload):
+    """Map GitHub release JSON into the canonical internal update schema."""
+    state = _default_update_state()
+    state["current_version"] = _normalize_version(__version__)
+    state["latest_tag"] = str(payload.get("tag_name", "")).strip()
+    state["latest_version"] = _normalize_version(state["latest_tag"])
+    state["release_url"] = str(payload.get("html_url", "")).strip()
+    state["archive_url"] = str(payload.get("tarball_url", "")).strip()
+
+    if not state["archive_url"] and state["latest_tag"]:
+        state["archive_url"] = f"https://github.com/{UPDATE_REPO}/archive/refs/tags/{state['latest_tag']}.tar.gz"
+    if not state["release_url"] and state["latest_tag"]:
+        state["release_url"] = f"https://github.com/{UPDATE_REPO}/releases/tag/{state['latest_tag']}"
+
+    state["update_available"] = _is_newer_version(state["latest_version"], state["current_version"])
+    state["checked_at"] = _utcnow_iso()
+    state["last_error"] = ""
+    return state
+
+
+def _is_update_check_due(snapshot):
+    """Use checked_at + interval to avoid excessive outbound release checks."""
+    last_checked = _parse_iso_utc(snapshot.get("checked_at", ""))
+    if last_checked is None:
+        return True
+    return (datetime.now(timezone.utc) - last_checked).total_seconds() >= UPDATE_CHECK_INTERVAL_SECONDS
+
+
+def _perform_update_check(force=False):
+    """
+    Run a release check and update shared state/cache.
+    - Non-forced checks respect the 24h cache window.
+    - Failures keep stale state and annotate last_error.
+    """
+    snapshot = _get_update_state_snapshot()
+    if _update_checks_disabled() and not force:
+        return snapshot
+    if not force and not _is_update_check_due(snapshot):
+        return snapshot
+
+    try:
+        payload = _fetch_latest_release_payload()
+        new_state = _build_update_state_from_release(payload)
+        merged = _merge_update_state(new_state)
+        _save_update_cache(merged)
+        return merged
+    except Exception as e:
+        stale_state = dict(snapshot)
+        stale_state["checked_at"] = _utcnow_iso()
+        stale_state["last_error"] = str(e)
+        merged = _merge_update_state(stale_state)
+        _save_update_cache(merged)
+        return merged
+
+
+def _public_update_state():
+    """Return the update state fields safe/required for API responses."""
+    snapshot = _get_update_state_snapshot()
+    return {
+        "current_version": snapshot.get("current_version", _normalize_version(__version__)),
+        "latest_version": snapshot.get("latest_version", ""),
+        "latest_tag": snapshot.get("latest_tag", ""),
+        "update_available": bool(snapshot.get("update_available", False)),
+        "checked_at": snapshot.get("checked_at", ""),
+        "release_url": snapshot.get("release_url", ""),
+        "last_error": snapshot.get("last_error", ""),
+    }
+
+
+def _print_update_notice_once(state):
+    """Print one concise startup notice only when an update is available."""
+    global _UPDATE_LAST_NOTIFIED_TAG
+    if not state.get("update_available"):
+        return
+    tag = state.get("latest_tag") or state.get("latest_version")
+    if not tag or tag == _UPDATE_LAST_NOTIFIED_TAG:
+        return
+    _UPDATE_LAST_NOTIFIED_TAG = tag
+    try:
+        print(f"[update] New version available: {state.get('current_version')} -> {state.get('latest_version')} (run: clawtelemetry update)")
+    except (ValueError, OSError):
+        pass
+
+
+def _start_update_checker(args):
+    """Start the background update checker once per effective server process."""
+    global _UPDATE_CHECKER_STARTED
+
+    # Load persisted state even when checks are disabled so the UI can still
+    # show the most recent known result.
+    _load_update_state_from_cache()
+    if _update_checks_disabled():
+        return
+
+    # Flask debug mode uses a reloader parent/child model; run checker only in
+    # the serving child process to prevent duplicate loops and API pressure.
+    if getattr(args, "debug", False):
+        if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
+            return
+
+    with _UPDATE_STATE_LOCK:
+        if _UPDATE_CHECKER_STARTED:
+            return
+        _UPDATE_CHECKER_STARTED = True
+
+    def _worker():
+        # Initial check at startup.
+        first_state = _perform_update_check(force=True)
+        _print_update_notice_once(first_state)
+
+        # Periodic refresh every 24h while process is alive.
+        while True:
+            try:
+                time.sleep(UPDATE_CHECK_INTERVAL_SECONDS)
+                _perform_update_check(force=True)
+            except Exception:
+                # Never let the background checker crash the server process.
+                pass
+
+    t = threading.Thread(target=_worker, daemon=True, name="update-checker")
+    t.start()
+
+
 # ── HTML Template ───────────────────────────────────────────────────────
 
 DASHBOARD_HTML = r"""
@@ -2619,6 +2910,13 @@ function clawtelemetryLogout(){
     <span class="refresh-time" id="refresh-time" style="font-size:11px;">Loading...</span>
   </div>
 
+  <!-- Read-only update notice surfaced from server-side release checks. -->
+  <div id="update-banner" style="display:none;align-items:center;gap:10px;padding:10px 12px;margin-bottom:10px;background:var(--bg-warning);border:1px solid var(--text-warning);border-radius:8px;color:var(--text-warning);font-size:12px;">
+    <span style="font-size:14px;">⬆️</span>
+    <span id="update-banner-msg" style="flex:1;"></span>
+    <a id="update-banner-link" href="#" target="_blank" rel="noopener noreferrer" style="display:none;color:var(--text-link);font-weight:600;text-decoration:none;">Release notes</a>
+  </div>
+
   <!-- Stats Bar (top) -->
   <div class="stats-footer">
     <div class="stats-footer-item">
@@ -3712,10 +4010,39 @@ function setFlowTextAll(idSuffix, text, maxLen) {
   });
 }
 
+function renderUpdateBanner(updateInfo) {
+  var banner = document.getElementById('update-banner');
+  var msg = document.getElementById('update-banner-msg');
+  var link = document.getElementById('update-banner-link');
+  if (!banner || !msg || !link) return;
+
+  if (!updateInfo || !updateInfo.update_available) {
+    banner.style.display = 'none';
+    msg.textContent = '';
+    link.style.display = 'none';
+    link.removeAttribute('href');
+    return;
+  }
+
+  var currentVersion = updateInfo.current_version || 'current';
+  var latestVersion = updateInfo.latest_version || updateInfo.latest_tag || 'latest';
+  msg.textContent = 'Update available: ' + currentVersion + ' -> ' + latestVersion + '. Run `clawtelemetry update` in your terminal.';
+
+  if (updateInfo.release_url) {
+    link.href = updateInfo.release_url;
+    link.style.display = '';
+  } else {
+    link.style.display = 'none';
+    link.removeAttribute('href');
+  }
+  banner.style.display = 'flex';
+}
+
 async function loadAll() {
   try {
     // Render overview quickly; do not block on heavy usage aggregation.
     var overview = await fetchJsonWithTimeout('/api/overview', 3000);
+    renderUpdateBanner(overview.update);
 
     // Start secondary panels immediately.
     startActiveTasksRefresh();
@@ -9759,6 +10086,7 @@ def api_overview():
         'memorySize': total_size,
         'system': system,
         'infra': infra,
+        'update': _public_update_state(),
     })
 
 
@@ -15199,6 +15527,7 @@ Commands:
   stop           Stop the background service
   restart        Restart the background service
   status         Show service status, port, and uptime
+  update         Update to the latest GitHub release
   uninstall      Remove the background service
 
 Options:
@@ -15214,6 +15543,7 @@ Examples:
   clawtelemetry start              Start as background service on port 8900
   clawtelemetry start --port 9000  Start on custom port
   clawtelemetry status             Check if running
+  clawtelemetry update             Update to latest release
 
 Docs: https://github.com/plgonzalezrx8/clawtelemetry/tree/main/docs
 """
@@ -15620,6 +15950,68 @@ def cmd_status(args):
 """)
 
 
+def cmd_update(args):
+    """Update ClawTelemetry to the latest published GitHub release."""
+    import subprocess
+
+    print("Checking latest ClawTelemetry release...")
+    update_state = _perform_update_check(force=True)
+    latest_tag = update_state.get('latest_tag', '')
+    latest_version = update_state.get('latest_version', '') or latest_tag
+    current_version = update_state.get('current_version', _normalize_version(__version__))
+
+    if not latest_tag:
+        print("❌ Could not resolve latest release metadata.")
+        if update_state.get('last_error'):
+            print(f"   Details: {update_state.get('last_error')}")
+        sys.exit(1)
+
+    if not update_state.get('update_available'):
+        print(f"[ok] ClawTelemetry is already up to date ({current_version}).")
+        return
+
+    archive_url = update_state.get('archive_url', '')
+    if not archive_url:
+        archive_url = f"https://github.com/{UPDATE_REPO}/archive/refs/tags/{latest_tag}.tar.gz"
+
+    # --yes is intentionally accepted as a no-op for scripting clarity and
+    # forward compatibility (this command remains promptless by default).
+    _ = getattr(args, 'yes', False)
+
+    print(f"Updating ClawTelemetry {current_version} -> {latest_version}")
+    print(f"Release: {update_state.get('release_url') or latest_tag}")
+    print("Installing update package...")
+    result = subprocess.run([
+        sys.executable,
+        '-m',
+        'pip',
+        'install',
+        '--no-cache-dir',
+        '--upgrade',
+        archive_url,
+    ])
+    if result.returncode != 0:
+        print("❌ Update failed during package install.")
+        print("   Troubleshooting: run update with the same Python environment that owns your current clawtelemetry binary.")
+        sys.exit(result.returncode or 1)
+
+    print(f"[ok] Update installed ({latest_version}).")
+
+    if _service_running():
+        print("Detected running ClawTelemetry service. Restarting...")
+        try:
+            cmd_restart(args)
+        except SystemExit as e:
+            code = e.code if isinstance(e.code, int) else 1
+            if code != 0:
+                print("❌ Service restart failed after update.")
+                print("   Run manually: clawtelemetry restart")
+                sys.exit(code)
+        print("[ok] Service restarted.")
+    else:
+        print("No background service detected. Start with: clawtelemetry start")
+
+
 def cmd_connect(args):
     """Connect to ClawTelemetry Cloud."""
     print()
@@ -15748,6 +16140,7 @@ def _run_server(args):
     _budget_init_db()
     _start_fleet_maintenance_thread()
     _start_budget_monitor_thread()
+    _start_update_checker(args)
 
     # Detached/background launches (notably on Windows CI) may not have open
     # stdio handles. Guard startup logs so server boot cannot fail on logging.
@@ -15918,6 +16311,12 @@ def main():
     p_status = subparsers.add_parser('status', parents=[shared], add_help=True,
                                      help='Show service status, port, and uptime')
 
+    # clawtelemetry update
+    p_update = subparsers.add_parser('update', parents=[shared], add_help=True,
+                                     help='Update to the latest GitHub release')
+    p_update.add_argument('--yes', action='store_true',
+                          help='Run non-interactively (accepted for script compatibility)')
+
     # clawtelemetry connect
     p_connect = subparsers.add_parser('connect', parents=[shared], add_help=True,
                                       help=argparse.SUPPRESS)
@@ -15948,6 +16347,8 @@ def main():
         cmd_restart(args)
     elif args.command == 'status':
         cmd_status(args)
+    elif args.command == 'update':
+        cmd_update(args)
     elif args.command == 'connect':
         cmd_connect(args)
     elif args.command == 'uninstall':

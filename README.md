@@ -39,6 +39,17 @@ clawtelemetry --workspace ~/mybot
 clawtelemetry --name "Alice"
 ```
 
+## Update
+
+```bash
+clawtelemetry update
+```
+
+- Updates to the latest GitHub Release.
+- If a background ClawTelemetry service is running, it is restarted automatically after a successful update.
+- If install permissions fail, rerun the command with the Python environment that owns your current `clawtelemetry` binary.
+- Optional for CI/offline: set `CLAWTELEMETRY_DISABLE_UPDATE_CHECK=1` to disable automatic background update checks.
+
 ## From Source
 
 ```bash
