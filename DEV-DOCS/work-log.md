@@ -104,7 +104,7 @@
   - auto-restarts service when active
 
 ### Validation
-- `clawtelemetry --version` -> `0.12.3`
+- `clawtelemetry --version` -> `0.12.4`
 - `clawtelemetry update` reports up-to-date state when no newer release exists
 - overview endpoint includes `update` object without blocking on network calls
 

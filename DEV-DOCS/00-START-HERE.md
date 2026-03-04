@@ -4,7 +4,7 @@
 Keep `DEV-DOCS` aligned with current runtime, CI, and release behavior while executing remaining engineering-core remediation items.
 
 ## Current Snapshot (2026-03-04, refreshed)
-- Canonical version is `0.12.3`.
+- Canonical version is `0.12.4`.
 - Branch model is active as `main` (production) + `development` (integration).
 - Distribution is GitHub-only (install scripts + GitHub Releases).
 - Dashboard now performs built-in version checks at startup and every 24h.
