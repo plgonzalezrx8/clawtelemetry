@@ -69,7 +69,9 @@ jobs:
         run: install.cmd
       - name: Verify clawtelemetry binary
         shell: cmd
-        run: clawtelemetry --version
+        run: |
+          set PATH=%LOCALAPPDATA%\clawtelemetry\Scripts;%PATH%
+          clawtelemetry --version
 
   shellcheck:
     runs-on: ubuntu-latest
