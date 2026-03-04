@@ -15749,49 +15749,57 @@ def _run_server(args):
     _start_fleet_maintenance_thread()
     _start_budget_monitor_thread()
 
-    print(BANNER.format(version=__version__))
-    print(f"  Workspace:  {WORKSPACE}")
-    print(f"  Sessions:   {SESSIONS_DIR}")
-    print(f"  Logs:       {LOG_DIR}")
-    print(f"  Metrics:    {_metrics_file_path()}")
+    # Detached/background launches (notably on Windows CI) may not have open
+    # stdio handles. Guard startup logs so server boot cannot fail on logging.
+    def _safe_print(*parts):
+        try:
+            print(*parts)
+        except (ValueError, OSError):
+            pass
+
+    _safe_print(BANNER.format(version=__version__))
+    _safe_print(f"  Workspace:  {WORKSPACE}")
+    _safe_print(f"  Sessions:   {SESSIONS_DIR}")
+    _safe_print(f"  Logs:       {LOG_DIR}")
+    _safe_print(f"  Metrics:    {_metrics_file_path()}")
     if _HAS_OTEL_PROTO:
-        print(f"  OTLP:       [ok] Ready (opentelemetry-proto installed)")
-    print(f"  User:       {USER_NAME}")
-    print(f"  Mode:       {'[dev]  Dev (auto-reload ON)' if args.debug else '[prod] Prod (auto-reload OFF)'}")
-    print(f"  SSE Limits: {SSE_MAX_SECONDS}s max duration - logs {MAX_LOG_STREAM_CLIENTS} clients - health {MAX_HEALTH_STREAM_CLIENTS} clients")
-    print(f"  Fleet DB:   {_fleet_db_path()}")
-    print(f"  Fleet Auth: {'Enabled (key set)' if FLEET_API_KEY else 'Open (no key - set --fleet-api-key for production)'}")
+        _safe_print(f"  OTLP:       [ok] Ready (opentelemetry-proto installed)")
+    _safe_print(f"  User:       {USER_NAME}")
+    _safe_print(f"  Mode:       {'[dev]  Dev (auto-reload ON)' if args.debug else '[prod] Prod (auto-reload OFF)'}")
+    _safe_print(f"  SSE Limits: {SSE_MAX_SECONDS}s max duration - logs {MAX_LOG_STREAM_CLIENTS} clients - health {MAX_HEALTH_STREAM_CLIENTS} clients")
+    _safe_print(f"  Fleet DB:   {_fleet_db_path()}")
+    _safe_print(f"  Fleet Auth: {'Enabled (key set)' if FLEET_API_KEY else 'Open (no key - set --fleet-api-key for production)'}")
     if _HAS_HISTORY and _history_db:
-        print(f"  History DB: {_history_db.db_path}")
+        _safe_print(f"  History DB: {_history_db.db_path}")
     else:
-        print(f"  History:    Disabled (history.py not found)")
-    print()
+        _safe_print(f"  History:    Disabled (history.py not found)")
+    _safe_print()
 
     warnings, tips = validate_configuration()
     if warnings or tips:
-        print("[check] Configuration Check:")
+        _safe_print("[check] Configuration Check:")
         for warning in warnings:
-            print(f"  {warning}")
+            _safe_print(f"  {warning}")
         for tip in tips:
-            print(f"  {tip}")
-        print()
+            _safe_print(f"  {tip}")
+        _safe_print()
         if warnings:
-            print("[tip] The dashboard will work with limited functionality. See tips above for full experience.")
-            print()
+            _safe_print("[tip] The dashboard will work with limited functionality. See tips above for full experience.")
+            _safe_print()
 
     local_ip = get_local_ip()
     public_ip = get_public_ip()
-    print(f"  -> http://localhost:{args.port}")
+    _safe_print(f"  -> http://localhost:{args.port}")
     if local_ip != '127.0.0.1':
-        print(f"  -> http://{local_ip}:{args.port}  (LAN)")
+        _safe_print(f"  -> http://{local_ip}:{args.port}  (LAN)")
     if public_ip and public_ip != local_ip:
-        print(f"  -> http://{public_ip}:{args.port}  (Public - ensure port is open)")
+        _safe_print(f"  -> http://{public_ip}:{args.port}  (Public - ensure port is open)")
     if _HAS_OTEL_PROTO:
-        print(f"  -> OTLP endpoint: http://{local_ip}:{args.port}/v1/metrics")
-    print()
+        _safe_print(f"  -> OTLP endpoint: http://{local_ip}:{args.port}/v1/metrics")
+    _safe_print()
     if not args.debug:
-        print(f"  Tip: run as background service with: clawtelemetry start")
-        print()
+        _safe_print(f"  Tip: run as background service with: clawtelemetry start")
+        _safe_print()
 
     if args.debug:
         # Dev mode -- use Flask's reloader
