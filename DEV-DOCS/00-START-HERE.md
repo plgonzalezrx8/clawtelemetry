@@ -1,13 +1,16 @@
 # 00 Start Here
 
 ## Current Objective
-Complete a full engineering-core audit and establish durable internal docs for ClawTelemetry.
+Keep `DEV-DOCS` aligned with current runtime, CI, and release behavior while executing remaining engineering-core remediation items.
 
-## Current Snapshot (2026-03-04)
-- `DEV-DOCS` scaffold and audit dossier created.
-- Evidence artifacts generated under `DEV-DOCS/reports/`.
-- Full API suite confirmed passing in isolated run when using configured gateway token file.
-- Major architectural risk identified: duplicate implementation blocks in `dashboard.py`.
+## Current Snapshot (2026-03-04, refreshed)
+- Canonical version is `0.12.3`.
+- Branch model is active as `main` (production) + `development` (integration).
+- Distribution is GitHub-only (install scripts + GitHub Releases).
+- Dashboard now performs built-in version checks at startup and every 24h.
+- Overview API/UI exposes a read-only update notice when a newer release exists.
+- CLI now supports `clawtelemetry update` (GitHub release install + service auto-restart when active).
+- Duplicate runtime blocks in `dashboard.py` were removed; route surface remains stable at `90` routes.
 
 ## First Reads For New Session
 1. `DEV-DOCS/DEVELOPMENT-STATUS.md`
@@ -16,9 +19,9 @@ Complete a full engineering-core audit and establish durable internal docs for C
 4. `DEV-DOCS/audit/99_EVIDENCE_INDEX.md`
 
 ## Immediate Priorities
-- align auth/bootstrap behavior for deterministic local test startup
-- decide and execute strategy to remove duplicate runtime blocks in `dashboard.py`
-- reduce exception swallowing in critical paths
+- reduce broad exception swallowing in critical auth/file/network paths
+- tighten release/install/update lifecycle validation across all platforms
+- add lightweight performance benchmark artifacts for long-running sessions
 
 ## Quick Commands
 ```bash
@@ -29,7 +32,11 @@ python3 -m py_compile dashboard.py history.py clawtelemetry/*.py clawtelemetry/p
 CLAWTELEMETRY_URL=http://127.0.0.1:8924 CLAWTELEMETRY_TOKEN=<token> pytest -q tests/test_api.py -q
 
 # run server
-python3 dashboard.py --port 8900 --no-debug
+clawtelemetry --host 0.0.0.0 --port 8900
+
+# check installed version and update
+clawtelemetry --version
+clawtelemetry update
 ```
 
 ## Operating Constraints

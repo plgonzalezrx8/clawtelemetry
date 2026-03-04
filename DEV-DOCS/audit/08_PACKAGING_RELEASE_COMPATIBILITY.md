@@ -1,7 +1,7 @@
 # 08 Packaging, Release, and Compatibility
 
 ## Summary
-Packaging has been converged to a single path with GitHub Release assets as the only public distribution channel.
+Packaging is converged to a single GitHub-only distribution path. Release automation now triggers from `main` merges/pushes (or manual dispatch) and publishes once per dashboard version tag.
 
 ## Findings
 
@@ -34,11 +34,12 @@ Packaging has been converged to a single path with GitHub Release assets as the 
 ### PKG-03 Release automation remains mandatory
 - ID: `PKG-03`
 - Severity: `P3`
-- Impact: Positive control; future cleanup work could accidentally break release path.
+- Impact: Positive control; future changes could accidentally break release path.
 - Likelihood: Medium
 - Affected files:
   - `.github/workflows/publish.yml`
 - Evidence:
   - workflow snapshot in `../reports/ci-packaging-snapshot-2026-03-04.txt`
+  - current workflow behavior: push/merge to `main` publishes release for current `dashboard.py` version if tag does not yet exist
 - Recommended fix:
-  - include release workflow smoke check in any packaging refactor PR
+  - include release workflow smoke checks in packaging/install/update refactor PRs

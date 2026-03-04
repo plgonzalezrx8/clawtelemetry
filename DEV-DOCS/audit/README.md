@@ -12,6 +12,14 @@ Engineering-core audit of:
 - packaging and release compatibility
 - documentation and comment quality
 
+## Baseline and Currency
+- Baseline audit snapshot date: `2026-03-04`.
+- Reports in `DEV-DOCS/reports/` are point-in-time evidence artifacts and remain immutable.
+- Post-baseline remediation progress is tracked in:
+  - `DEV-DOCS/DEVELOPMENT-STATUS.md`
+  - `DEV-DOCS/work-log.md`
+  - `DEV-DOCS/audit/10_REMEDIATION_ROADMAP.md`
+
 ## Reading Order
 1. [00_AUDIT_SCOPE_AND_METHOD.md](./00_AUDIT_SCOPE_AND_METHOD.md)
 2. [01_ARCHITECTURE_AND_MODULE_BOUNDARIES.md](./01_ARCHITECTURE_AND_MODULE_BOUNDARIES.md)

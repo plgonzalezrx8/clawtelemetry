@@ -1,7 +1,12 @@
 # 06 Performance and Resource Usage
 
 ## Summary
-The project is performance-aware in some areas (bounded stores), but duplicated code and repeated subprocess work can degrade efficiency.
+Performance safeguards exist (bounded stores and lightweight defaults). Duplicate-block overhead was removed post-baseline; remaining performance risk is endpoint subprocess cost under frequent polling and missing long-run profiling artifacts.
+
+## Status Update (Post-Baseline)
+- `PFM-01`: Resolved (duplicate runtime/template blocks removed)
+- `PFM-02`: Open (short-lived cache opportunity remains)
+- `PFM-03`: Open (long-run profiling artifacts still needed)
 
 ## Findings
 
@@ -9,14 +14,14 @@ The project is performance-aware in some areas (bounded stores), but duplicated 
 - ID: `PFM-01`
 - Severity: `P2`
 - Impact: Larger source and duplicated logic increase startup parsing cost and maintenance overhead.
-- Likelihood: High
+- Likelihood: High (baseline), Low (current)
 - Affected files:
   - `dashboard.py`
 - Evidence:
-  - duplicate scan in `../reports/duplicate-scan-2026-03-04.txt`
-  - file size snapshot in `../reports/code-quality-scan-2026-03-04.txt`
+  - baseline duplicate scan in `../reports/duplicate-scan-2026-03-04.txt`
+  - post-remediation duplicate scan in `../reports/duplicate-scan-post-remediation-2026-03-04.txt`
 - Recommended fix:
-  - deduplicate template/runtime blocks without changing single-file architecture
+  - completed: deduplicated template/runtime blocks while preserving single-file architecture
 
 ### PFM-02 Some overview/system endpoints rely on repeated subprocess calls per request
 - ID: `PFM-02`

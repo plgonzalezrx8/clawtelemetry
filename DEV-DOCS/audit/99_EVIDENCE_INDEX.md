@@ -1,5 +1,10 @@
 # 99 Evidence Index
 
+## Scope Note
+- The files listed below are baseline snapshots collected on `2026-03-04`.
+- They remain immutable historical evidence.
+- Current post-baseline status is tracked in `DEV-DOCS/DEVELOPMENT-STATUS.md` and `DEV-DOCS/work-log.md`.
+
 ## Generated Artifacts (`DEV-DOCS/reports`)
 
 ### Core inventories

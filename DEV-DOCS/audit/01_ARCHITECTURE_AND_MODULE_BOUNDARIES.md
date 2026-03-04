@@ -1,7 +1,12 @@
 # 01 Architecture and Module Boundaries
 
 ## Summary
-The project follows a valid single-file architecture goal, but current implementation contains duplicated runtime blocks and boundary drift that significantly increase maintenance risk.
+Baseline audit identified duplicated runtime blocks and boundary drift in `dashboard.py`. Duplicate-block findings have since been remediated; remaining risk centers on single-file complexity and global-state coupling.
+
+## Status Update (Post-Baseline)
+- `ARC-01`: Resolved (`dashboard.py` duplicate runtime blocks removed)
+- `ARC-02`: Resolved (`detect_config` no longer redefined)
+- `ARC-03`: Open (global mutable state coupling remains)
 
 ## Findings
 
@@ -9,29 +14,27 @@ The project follows a valid single-file architecture goal, but current implement
 - ID: `ARC-01`
 - Severity: `P1`
 - Impact: Duplicate helper/runtime definitions increase drift risk and make execution order non-obvious.
-- Likelihood: High
+- Likelihood: High (baseline), Low (current after remediation)
 - Affected files:
   - `dashboard.py`
 - Evidence:
   - duplicated function definitions and duplicate `DASHBOARD_HTML` constants captured in `../reports/duplicate-scan-2026-03-04.txt`
-  - duplicate function line regions include `detect_config`, `_metrics_file_path`, `_load_metrics_from_disk`, `_save_metrics_to_disk`
+  - post-remediation verification in `../reports/duplicate-scan-post-remediation-2026-03-04.txt`
 - Recommended fix:
-  - collapse duplicated blocks into a single authoritative implementation section
-  - add section headers and ownership comments for each runtime subsystem
+  - completed: collapsed duplicated blocks into one authoritative implementation section
 
 ### ARC-02 `detect_config` behavior is redefined, creating dead/overwritten initialization paths
 - ID: `ARC-02`
 - Severity: `P1`
-- Impact: Earlier `detect_config` path initializes provider, later redefinition registers blueprints and can change startup semantics.
-- Likelihood: High
+- Impact: Earlier `detect_config` path initialized provider differently than later definition, creating startup ambiguity.
+- Likelihood: High (baseline), Low (current after remediation)
 - Affected files:
   - `dashboard.py`
 - Evidence:
-  - line regions show two `detect_config` definitions (`../reports/duplicate-scan-2026-03-04.txt`)
-  - first definition includes `_init_data_provider()`, later one replaces that behavior
+  - line regions showed two `detect_config` definitions (`../reports/duplicate-scan-2026-03-04.txt`)
+  - post-remediation duplicate scan confirms single definition
 - Recommended fix:
-  - keep one `detect_config` function
-  - split internal steps into explicitly called helper functions within same file
+  - completed: one `detect_config` function retained with explicit internal helper flow
 
 ### ARC-03 Global mutable state dominates cross-cutting boundaries
 - ID: `ARC-03`
