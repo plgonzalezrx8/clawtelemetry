@@ -15757,67 +15757,74 @@ def _run_server(args):
         except (ValueError, OSError):
             pass
 
-    _safe_print(BANNER.format(version=__version__))
-    _safe_print(f"  Workspace:  {WORKSPACE}")
-    _safe_print(f"  Sessions:   {SESSIONS_DIR}")
-    _safe_print(f"  Logs:       {LOG_DIR}")
-    _safe_print(f"  Metrics:    {_metrics_file_path()}")
-    if _HAS_OTEL_PROTO:
-        _safe_print(f"  OTLP:       [ok] Ready (opentelemetry-proto installed)")
-    _safe_print(f"  User:       {USER_NAME}")
-    _safe_print(f"  Mode:       {'[dev]  Dev (auto-reload ON)' if args.debug else '[prod] Prod (auto-reload OFF)'}")
-    _safe_print(f"  SSE Limits: {SSE_MAX_SECONDS}s max duration - logs {MAX_LOG_STREAM_CLIENTS} clients - health {MAX_HEALTH_STREAM_CLIENTS} clients")
-    _safe_print(f"  Fleet DB:   {_fleet_db_path()}")
-    _safe_print(f"  Fleet Auth: {'Enabled (key set)' if FLEET_API_KEY else 'Open (no key - set --fleet-api-key for production)'}")
-    if _HAS_HISTORY and _history_db:
-        _safe_print(f"  History DB: {_history_db.db_path}")
-    else:
-        _safe_print(f"  History:    Disabled (history.py not found)")
-    _safe_print()
+    # Flask debug reloader launches this function twice: parent process first,
+    # then child process after "Restarting with stat". Print the startup
+    # summary only from the parent to avoid duplicate launch output.
+    is_reloader_child = _os.environ.get('WERKZEUG_RUN_MAIN') == 'true'
+    should_print_startup = not (args.debug and is_reloader_child)
 
-    warnings, tips = validate_configuration()
-    if warnings or tips:
-        _safe_print("[check] Configuration Check:")
-        for warning in warnings:
-            _safe_print(f"  {warning}")
-        for tip in tips:
-            _safe_print(f"  {tip}")
+    if should_print_startup:
+        _safe_print(BANNER.format(version=__version__))
+        _safe_print(f"  Workspace:  {WORKSPACE}")
+        _safe_print(f"  Sessions:   {SESSIONS_DIR}")
+        _safe_print(f"  Logs:       {LOG_DIR}")
+        _safe_print(f"  Metrics:    {_metrics_file_path()}")
+        if _HAS_OTEL_PROTO:
+            _safe_print(f"  OTLP:       [ok] Ready (opentelemetry-proto installed)")
+        _safe_print(f"  User:       {USER_NAME}")
+        _safe_print(f"  Mode:       {'[dev]  Dev (auto-reload ON)' if args.debug else '[prod] Prod (auto-reload OFF)'}")
+        _safe_print(f"  SSE Limits: {SSE_MAX_SECONDS}s max duration - logs {MAX_LOG_STREAM_CLIENTS} clients - health {MAX_HEALTH_STREAM_CLIENTS} clients")
+        _safe_print(f"  Fleet DB:   {_fleet_db_path()}")
+        _safe_print(f"  Fleet Auth: {'Enabled (key set)' if FLEET_API_KEY else 'Open (no key - set --fleet-api-key for production)'}")
+        if _HAS_HISTORY and _history_db:
+            _safe_print(f"  History DB: {_history_db.db_path}")
+        else:
+            _safe_print(f"  History:    Disabled (history.py not found)")
         _safe_print()
-        if warnings:
-            _safe_print("[tip] The dashboard will work with limited functionality. See tips above for full experience.")
+
+        warnings, tips = validate_configuration()
+        if warnings or tips:
+            _safe_print("[check] Configuration Check:")
+            for warning in warnings:
+                _safe_print(f"  {warning}")
+            for tip in tips:
+                _safe_print(f"  {tip}")
             _safe_print()
+            if warnings:
+                _safe_print("[tip] The dashboard will work with limited functionality. See tips above for full experience.")
+                _safe_print()
 
-    local_ip = get_local_ip()
-    public_ip = get_public_ip()
+        local_ip = get_local_ip()
+        public_ip = get_public_ip()
 
-    # Startup URLs should reflect the actual bind host so operators are not
-    # told LAN is reachable when the process is loopback-only.
-    bind_host_raw = (args.host or '').strip()
-    bind_host = bind_host_raw.lower()
-    host_is_loopback = bind_host in ('127.0.0.1', 'localhost', '::1')
-    host_is_any = bind_host in ('0.0.0.0', '::')
+        # Startup URLs should reflect the actual bind host so operators are not
+        # told LAN is reachable when the process is loopback-only.
+        bind_host_raw = (args.host or '').strip()
+        bind_host = bind_host_raw.lower()
+        host_is_loopback = bind_host in ('127.0.0.1', 'localhost', '::1')
+        host_is_any = bind_host in ('0.0.0.0', '::')
 
-    if host_is_any:
-        _safe_print(f"  -> http://localhost:{args.port}")
-        if local_ip != '127.0.0.1':
-            _safe_print(f"  -> http://{local_ip}:{args.port}  (LAN)")
-        if public_ip and public_ip != local_ip:
-            _safe_print(f"  -> http://{public_ip}:{args.port}  (Public - ensure port is open)")
-        otlp_host = local_ip if local_ip != '127.0.0.1' else 'localhost'
-    elif host_is_loopback:
-        _safe_print(f"  -> http://localhost:{args.port}")
-        _safe_print("  -> LAN disabled (bound to loopback). Use --host 0.0.0.0 for LAN access.")
-        otlp_host = 'localhost'
-    else:
-        _safe_print(f"  -> http://{bind_host_raw}:{args.port}  (Bound host)")
-        otlp_host = bind_host_raw
+        if host_is_any:
+            _safe_print(f"  -> http://localhost:{args.port}")
+            if local_ip != '127.0.0.1':
+                _safe_print(f"  -> http://{local_ip}:{args.port}  (LAN)")
+            if public_ip and public_ip != local_ip:
+                _safe_print(f"  -> http://{public_ip}:{args.port}  (Public - ensure port is open)")
+            otlp_host = local_ip if local_ip != '127.0.0.1' else 'localhost'
+        elif host_is_loopback:
+            _safe_print(f"  -> http://localhost:{args.port}")
+            _safe_print("  -> LAN disabled (bound to loopback). Use --host 0.0.0.0 for LAN access.")
+            otlp_host = 'localhost'
+        else:
+            _safe_print(f"  -> http://{bind_host_raw}:{args.port}  (Bound host)")
+            otlp_host = bind_host_raw
 
-    if _HAS_OTEL_PROTO:
-        _safe_print(f"  -> OTLP endpoint: http://{otlp_host}:{args.port}/v1/metrics")
-    _safe_print()
-    if not args.debug:
-        _safe_print(f"  Tip: run as background service with: clawtelemetry start")
+        if _HAS_OTEL_PROTO:
+            _safe_print(f"  -> OTLP endpoint: http://{otlp_host}:{args.port}/v1/metrics")
         _safe_print()
+        if not args.debug:
+            _safe_print(f"  Tip: run as background service with: clawtelemetry start")
+            _safe_print()
 
     if args.debug:
         # Dev mode -- use Flask's reloader
