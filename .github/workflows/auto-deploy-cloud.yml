@@ -12,6 +12,9 @@ on:
 jobs:
   pin-version:
     name: Rebuild cloud with latest OSS
+    # This workflow updates an external cloud repo and needs a PAT scoped to it.
+    # Skip on forks/independent setups where CLOUD_REPO_PAT is not configured.
+    if: ${{ secrets.CLOUD_REPO_PAT != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout OSS repo

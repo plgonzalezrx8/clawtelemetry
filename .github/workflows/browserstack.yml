@@ -11,6 +11,9 @@ on:
 jobs:
   cross-browser:
     name: Cross-Browser Tests
+    # Forks and local-only setups typically do not have BrowserStack secrets.
+    # Skip gracefully when credentials are unavailable instead of failing main.
+    if: ${{ secrets.BROWSERSTACK_USERNAME != '' && secrets.BROWSERSTACK_ACCESS_KEY != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
