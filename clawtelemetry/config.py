@@ -1,5 +1,5 @@
 """
-ClawMetry configuration dataclass.
+ClawTelemetry configuration dataclass.
 Phase 2: defines the Config structure that will replace global variables in Phase 3.
 Currently used for type hints and documentation. dashboard.py globals remain unchanged.
 """
@@ -9,9 +9,9 @@ from typing import List, Optional
 
 
 @dataclass
-class ClawMetryConfig:
+class ClawTelemetryConfig:
     """
-    Unified configuration for ClawMetry.
+    Unified configuration for ClawTelemetry.
 
     In Phase 3, this will replace the module-level globals in dashboard.py:
     WORKSPACE, SESSIONS_DIR, LOG_DIR, MEMORY_DIR, METRICS_FILE, etc.
@@ -40,7 +40,7 @@ class ClawMetryConfig:
     # Auth
     auth_token: Optional[str] = None
 
-    def from_globals(self) -> "ClawMetryConfig":
+    def from_globals(self) -> "ClawTelemetryConfig":
         """Populate from dashboard.py module-level globals (migration bridge)."""
         try:
             import dashboard as d

@@ -1,7 +1,7 @@
-# CLAUDE.md — ClawMetry
+# CLAUDE.md — ClawTelemetry
 
 ## What is this?
-ClawMetry is an open-source, real-time observability dashboard for [OpenClaw](https://github.com/openclaw/openclaw) AI agents. `pip install clawmetry && clawmetry` — that's it.
+ClawTelemetry is an open-source, real-time observability dashboard for [OpenClaw](https://github.com/openclaw/openclaw) AI agents. GitHub release install scripts are the canonical distribution path.
 
 ## Architecture
 See `ARCHITECTURE.md` for the full deep dive. TL;DR:
@@ -13,9 +13,7 @@ See `ARCHITECTURE.md` for the full deep dive. TL;DR:
 ## Key Files
 - `dashboard.py` — The entire dashboard (server + frontend)
 - `history.py` — Optional time-series history module (SQLite)
-- `setup.py` — PyPI package config
-- `packages/clawmetry/` — pip package wrapper
-- `clawmetry-landing/` — Marketing website (clawmetry.com) [legacy, moved to separate repo]
+- `setup.py` — Python package metadata and CLI entrypoint metadata
 - `ARCHITECTURE.md` — Detailed architecture guide
 - `CHANGELOG.md` — Version history
 - `CONTRIBUTING.md` — Contribution guidelines
@@ -40,12 +38,16 @@ See `ARCHITECTURE.md` for the full deep dive. TL;DR:
 
 ## Running locally
 ```bash
-pip install flask
 python dashboard.py --workspace ~/your-openclaw-workspace
 ```
 
 ## Deploy
-PyPI: `pip install clawmetry && clawmetry`
+Use GitHub release installers:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/plgonzalezrx8/clawtelemetry/main/install.sh | bash
+```
+
 Current version: check `__version__` in dashboard.py
 
 ## Testing changes
@@ -58,5 +60,5 @@ Current version: check `__version__` in dashboard.py
 - **Single file** — don't split dashboard.py into modules. The single-file design is intentional for portability.
 - **Minimal dependencies** — Flask only. Don't add heavy libraries.
 - **Embedded frontend** — HTML/CSS/JS lives inside Python template strings. No build step.
-- **Read-only by default** — ClawMetry observes, it doesn't modify agent behavior (except cron management via gateway RPC).
+- **Read-only by default** — ClawTelemetry observes, it doesn't modify agent behavior (except cron management via gateway RPC).
 - **Auto-detect everything** — users should never need to configure anything manually.

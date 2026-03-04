@@ -10,8 +10,8 @@ OpenClaw Dashboard is built to be **simple, fast, and useful** for personal AI a
 
 ### 1. **Clone & Setup**
 ```bash
-git clone https://github.com/vivekchand/clawmetry.git
-cd clawmetry
+git clone https://github.com/plgonzalezrx8/clawtelemetry.git
+cd clawtelemetry
 pip install -r requirements.txt
 ```
 
@@ -24,7 +24,7 @@ python3 dashboard.py --port 8900
 ### 3. **Test Console Entry Point**
 ```bash
 pip install -e .
-clawmetry --help
+clawtelemetry --help
 ```
 
 ### 4. **Make Changes & Test**
@@ -37,7 +37,7 @@ clawmetry --help
 ## 📁 Project Structure
 
 ```
-clawmetry/
+clawtelemetry/
 ├── dashboard.py          # 🎯 Main application (single file)
 ├── README.md             # 📖 Documentation
 ├── setup.py              # 📦 Package configuration
@@ -95,8 +95,8 @@ Before submitting, test these scenarios:
 
 3. **Console entry point works** (after `pip install -e .`):
    ```bash
-   clawmetry --version
-   clawmetry --port 8902
+   clawtelemetry --version
+   clawtelemetry --port 8902
    ```
 
 4. **UI loads without errors**:
@@ -131,7 +131,7 @@ Brief description of the change.
 
 ## Testing
 - [ ] Tested auto-detection: `cd /tmp && python3 dashboard.py`
-- [ ] Tested console entry point: `clawmetry --help`
+- [ ] Tested console entry point: `clawtelemetry --help`
 - [ ] Tested new feature with real OpenClaw data
 - [ ] All tabs load without browser console errors
 
@@ -155,7 +155,7 @@ Brief description of the change.
 Brief description.
 
 **Steps to reproduce:**
-1. Start dashboard with `clawmetry`
+1. Start dashboard with `clawtelemetry`
 2. Click on Sessions tab
 3. Error appears in browser console
 
@@ -163,7 +163,7 @@ Brief description.
 - OS: Linux/macOS/Windows
 - Python version: `python3 --version` 
 - OpenClaw version: X.X.X
-- Dashboard version: `clawmetry --version`
+- Dashboard version: `clawtelemetry --version`
 
 **Logs/Screenshots:**
 Paste relevant error messages or attach screenshots.
@@ -206,7 +206,7 @@ How would you personally use this feature?
 - **General questions**: Open a GitHub Discussion
 - **Bug reports**: Open a GitHub Issue  
 - **Feature requests**: Open a GitHub Issue
-- **Quick questions**: Find @vivekchand on Twitter/LinkedIn
+- **Quick questions**: Open a GitHub Discussion in this repository
 
 ---
 

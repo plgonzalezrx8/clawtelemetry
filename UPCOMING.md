@@ -1,6 +1,6 @@
-# ClawMetry Upcoming Features
+# ClawTelemetry Upcoming Features
 
-*Features we're building next. Star the [repo](https://github.com/vivekchand/clawmetry) to stay updated.*
+*Features we're building next. Star the [repo](https://github.com/plgonzalezrx8/clawtelemetry) to stay updated.*
 
 ## Coming Soon
 
@@ -70,4 +70,4 @@
 - [Langsmith](https://smith.langchain.com) - LangChain tracing and debugging
 
 ## Contributing
-Feature requests? Open an [issue](https://github.com/vivekchand/clawmetry/issues) or PR!
+Feature requests? Open an [issue](https://github.com/plgonzalezrx8/clawtelemetry/issues) or PR!

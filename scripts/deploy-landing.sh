@@ -3,8 +3,8 @@ set -euo pipefail
 
 PROJECT_ID="${PROJECT_ID:-mission-control-v2-aivira}"
 REGION="${REGION:-europe-west1}"
-SERVICE_NAME="${SERVICE_NAME:-clawmetry-landing}"
-SOURCE_DIR="${SOURCE_DIR:-clawmetry-landing}"
+SERVICE_NAME="${SERVICE_NAME:-clawtelemetry-landing}"
+SOURCE_DIR="${SOURCE_DIR:-clawtelemetry-landing}"
 
 echo "Deploying ${SERVICE_NAME} from ${SOURCE_DIR}"
 echo "Project: ${PROJECT_ID}"

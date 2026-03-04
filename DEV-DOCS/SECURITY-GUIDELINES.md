@@ -1,7 +1,7 @@
 # Security Guidelines
 
 ## Security Model
-ClawMetry is a local observability tool with optional cloud sync. Core principle: least privilege and local data control.
+ClawTelemetry is a local observability tool with optional cloud sync. Core principle: least privilege and local data control.
 
 ## Auth and Access
 - API routes under `/api/*` require gateway token validation when configured.
@@ -11,7 +11,7 @@ ClawMetry is a local observability tool with optional cloud sync. Core principle
 ## Token Handling
 - Never log plaintext tokens.
 - Avoid committing machine-local token files.
-- Treat `~/.clawmetry-gateway.json` as sensitive local configuration.
+- Treat `~/.clawtelemetry-gateway.json` as sensitive local configuration.
 
 ## Filesystem Safety
 - Always enforce workspace-root checks for file reads.

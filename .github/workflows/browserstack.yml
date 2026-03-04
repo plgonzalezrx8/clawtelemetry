@@ -27,7 +27,7 @@ jobs:
       - name: Install Playwright browsers
         run: python3 -m playwright install chromium
 
-      - name: Start ClawMetry server
+      - name: Start ClawTelemetry server
         run: |
           OPENCLAW_GATEWAY_TOKEN=ci-test-token python3 dashboard.py --port 8900 --no-debug &
           for i in $(seq 1 30); do
@@ -45,15 +45,15 @@ jobs:
         uses: browserstack/github-actions/setup-local@master
         with:
           local-testing: start
-          local-identifier: clawmetry-${{ github.run_id }}
+          local-identifier: clawtelemetry-${{ github.run_id }}
 
       - name: Run tests via BrowserStack SDK
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-          BROWSERSTACK_LOCAL_IDENTIFIER: clawmetry-${{ github.run_id }}
-          CLAWMETRY_URL: http://localhost:8900
-          CLAWMETRY_TOKEN: ci-test-token
+          BROWSERSTACK_LOCAL_IDENTIFIER: clawtelemetry-${{ github.run_id }}
+          CLAWTELEMETRY_URL: http://localhost:8900
+          CLAWTELEMETRY_TOKEN: ci-test-token
         run: |
           BUILD_NUMBER=${{ github.run_number }} browserstack-sdk python3 -m pytest tests/test_e2e_browserstack.py -v --tb=short
 
@@ -62,4 +62,4 @@ jobs:
         uses: browserstack/github-actions/setup-local@master
         with:
           local-testing: stop
-          local-identifier: clawmetry-${{ github.run_id }}
+          local-identifier: clawtelemetry-${{ github.run_id }}

@@ -46,7 +46,7 @@ Every finding records:
 ## Key Inputs
 - `dashboard.py`
 - `history.py`
-- `clawmetry/` package modules
+- `clawtelemetry/` package modules
 - `tests/`
 - `.github/workflows/`
 - artifacts in `DEV-DOCS/reports/`

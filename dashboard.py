@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-ClawMetry - See your agent think 🦞
+ClawTelemetry - See your agent think 🦞
 
 Real-time observability dashboard for OpenClaw AI agents.
 Single-file Flask app with zero config - auto-detects your setup.
 
 Usage:
-    clawmetry                             # Auto-detect everything
-    clawmetry --port 9000                 # Custom port
-    clawmetry --workspace ~/bot           # Custom workspace
-    OPENCLAW_HOME=~/bot clawmetry
+    clawtelemetry                             # Auto-detect everything
+    clawtelemetry --port 9000                 # Custom port
+    clawtelemetry --workspace ~/bot           # Custom workspace
+    OPENCLAW_HOME=~/bot clawtelemetry
 
-https://github.com/vivekchand/clawmetry
+https://github.com/plgonzalezrx8/clawtelemetry
 MIT License
 """
 
@@ -65,7 +65,7 @@ __version__ = "0.11.28"
 
 # Extensions (Phase 2) — load plugins at import time; safe no-op if package not installed
 try:
-    from clawmetry.extensions import emit as _ext_emit, load_plugins as _ext_load
+    from clawtelemetry.extensions import emit as _ext_emit, load_plugins as _ext_load
     _ext_load()
 except ImportError:
     def _ext_emit(event, payload=None): pass  # noqa
@@ -134,7 +134,7 @@ _active_health_stream_clients = 0
 EXTRA_SERVICES = []  # List of {'name': str, 'port': int} from --monitor-service flags
 
 # ── Multi-Node Fleet Configuration ─────────────────────────────────────
-FLEET_API_KEY = os.environ.get("CLAWMETRY_FLEET_KEY", "")
+FLEET_API_KEY = os.environ.get("CLAWTELEMETRY_FLEET_KEY", "")
 FLEET_DB_PATH = None  # Set via CLI or auto-detected
 FLEET_NODE_TIMEOUT = 300  # seconds before node is considered offline
 
@@ -146,7 +146,7 @@ _budget_alert_cooldowns = {}  # rule_id -> last_fired_timestamp
 _AGENT_DOWN_SECONDS = 300  # 5 min with no OTLP data = agent down alert
 
 # ── OTLP Metrics Store ─────────────────────────────────────────────────
-METRICS_FILE = None  # Set via CLI/env, defaults to {WORKSPACE}/.clawmetry-metrics.json
+METRICS_FILE = None  # Set via CLI/env, defaults to {WORKSPACE}/.clawtelemetry-metrics.json
 _metrics_lock = threading.Lock()
 _otel_last_received = 0  # timestamp of last OTLP data received
 
@@ -166,8 +166,8 @@ def _metrics_file_path():
     if METRICS_FILE:
         return METRICS_FILE
     if WORKSPACE:
-        return os.path.join(WORKSPACE, '.clawmetry-metrics.json')
-    return os.path.expanduser('~/.clawmetry-metrics.json')
+        return os.path.join(WORKSPACE, '.clawtelemetry-metrics.json')
+    return os.path.expanduser('~/.clawtelemetry-metrics.json')
 
 
 def _load_metrics_from_disk():
@@ -293,8 +293,8 @@ def _fleet_db_path():
     if FLEET_DB_PATH:
         return FLEET_DB_PATH
     if WORKSPACE:
-        return os.path.join(WORKSPACE, '.clawmetry-fleet.db')
-    return os.path.expanduser('~/.clawmetry-fleet.db')
+        return os.path.join(WORKSPACE, '.clawtelemetry-fleet.db')
+    return os.path.expanduser('~/.clawtelemetry-fleet.db')
 
 
 def _fleet_db():
@@ -661,7 +661,7 @@ def _send_telegram_alert(message):
             url = f'https://api.telegram.org/bot{token}/sendMessage'
             payload = json.dumps({
                 'chat_id': chat_id,
-                'text': f'[ClawMetry Alert] {message}',
+                'text': f'[ClawTelemetry Alert] {message}',
                 'parse_mode': 'Markdown',
             }).encode()
             req = urllib.request.Request(
@@ -676,7 +676,7 @@ def _send_telegram_alert(message):
     try:
         _gw_invoke('message', {
             'action': 'send',
-            'message': f'[ClawMetry Alert] {message}',
+            'message': f'[ClawTelemetry Alert] {message}',
         })
     except Exception:
         pass
@@ -1480,7 +1480,7 @@ DASHBOARD_HTML = r"""
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClawMetry 🦞</title>
+<title>ClawTelemetry 🦞</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -2398,16 +2398,16 @@ DASHBOARD_HTML = r"""
 <div id="login-overlay" style="display:none;position:fixed;inset:0;z-index:99999;background:var(--bg-primary,#0f172a);align-items:center;justify-content:center;flex-direction:column;">
   <div style="background:var(--card-bg,#1e293b);border-radius:16px;padding:40px;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.4);text-align:center;">
     <div style="font-size:48px;margin-bottom:16px;">🦞</div>
-    <h2 style="color:#e2e8f0;margin:0 0 8px;">ClawMetry</h2>
+    <h2 style="color:#e2e8f0;margin:0 0 8px;">ClawTelemetry</h2>
     <p style="color:#94a3b8;margin:0 0 24px;font-size:14px;">Enter your OpenClaw Gateway Token</p>
-    <input id="login-token" type="password" placeholder="Gateway token..." style="width:100%;box-sizing:border-box;padding:12px 16px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#e2e8f0;font-size:15px;margin-bottom:16px;outline:none;" onkeydown="if(event.key==='Enter')clawmetryLogin()">
-    <button onclick="clawmetryLogin()" style="width:100%;padding:12px;border-radius:8px;border:none;background:#3b82f6;color:#fff;font-size:15px;font-weight:600;cursor:pointer;">Login</button>
+    <input id="login-token" type="password" placeholder="Gateway token..." style="width:100%;box-sizing:border-box;padding:12px 16px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#e2e8f0;font-size:15px;margin-bottom:16px;outline:none;" onkeydown="if(event.key==='Enter')clawtelemetryLogin()">
+    <button onclick="clawtelemetryLogin()" style="width:100%;padding:12px;border-radius:8px;border:none;background:#3b82f6;color:#fff;font-size:15px;font-weight:600;cursor:pointer;">Login</button>
     <p id="login-error" style="color:#f87171;margin:12px 0 0;font-size:13px;display:none;">Invalid token</p>
   </div>
 </div>
 <script>
 (function(){
-  var stored = localStorage.getItem('clawmetry-token');
+  var stored = localStorage.getItem('clawtelemetry-token');
   fetch('/api/auth/check' + (stored ? '?token=' + encodeURIComponent(stored) : ''))
     .then(function(r){return r.json()})
     .then(function(d){
@@ -2433,14 +2433,14 @@ DASHBOARD_HTML = r"""
     })
     .catch(function(){document.getElementById('login-overlay').style.display='none';});
 })();
-function clawmetryLogin(){
+function clawtelemetryLogin(){
   var tok=document.getElementById('login-token').value.trim();
   if(!tok)return;
   fetch('/api/auth/check?token='+encodeURIComponent(tok))
     .then(function(r){return r.json()})
     .then(function(d){
       if(d.valid){
-        localStorage.setItem('clawmetry-token',tok);
+        localStorage.setItem('clawtelemetry-token',tok);
         document.getElementById('login-overlay').style.display='none';
         var lb=document.getElementById('logout-btn');if(lb)lb.style.display='';
         location.reload();
@@ -2449,15 +2449,15 @@ function clawmetryLogin(){
       }
     });
 }
-function clawmetryLogout(){
-  localStorage.removeItem('clawmetry-token');
+function clawtelemetryLogout(){
+  localStorage.removeItem('clawtelemetry-token');
   location.reload();
 }
 // Inject auth header into all fetch calls
 (function(){
   var _origFetch=window.fetch;
   window.fetch=function(url,opts){
-    var tok=localStorage.getItem('clawmetry-token');
+    var tok=localStorage.getItem('clawtelemetry-token');
     if(tok && typeof url==='string' && url.startsWith('/api/')){
       opts=opts||{};
       opts.headers=opts.headers||{};
@@ -2471,7 +2471,7 @@ function clawmetryLogout(){
 <div class="boot-overlay" id="boot-overlay">
   <div class="boot-card">
     <div class="boot-spinner"></div>
-    <div class="boot-title">Initializing ClawMetry</div>
+    <div class="boot-title">Initializing ClawTelemetry</div>
     <div class="boot-sub" id="boot-sub">Loading model, tasks, system health, and live streams…</div>
     <div class="boot-steps">
       <div class="boot-step loading" id="boot-step-overview"><span class="boot-dot"></span><span>Loading overview + model context</span></div>
@@ -2483,12 +2483,12 @@ function clawmetryLogout(){
 </div>
 <div class="zoom-wrapper" id="zoom-wrapper">
 <div class="nav">
-  <h1><span>🦞</span> ClawMetry</h1>
+  <h1><span>🦞</span> ClawTelemetry</h1>
   <div class="theme-toggle" onclick="var o=document.getElementById('gw-setup-overlay');o.dataset.mandatory='false';document.getElementById('gw-setup-close').style.display='';o.style.display='flex'" title="Gateway settings" style="cursor:pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
   <!-- Budget & Alerts hidden until mature -->
   <!-- <div class="theme-toggle" onclick="openBudgetModal()" title="Budget & Alerts" style="cursor:pointer;">&#128176;</div> -->
 
-  <div class="theme-toggle" id="logout-btn" onclick="clawmetryLogout()" title="Logout" style="display:none;cursor:pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+  <div class="theme-toggle" id="logout-btn" onclick="clawtelemetryLogout()" title="Logout" style="display:none;cursor:pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
   <div class="zoom-controls">
     <button class="zoom-btn" onclick="zoomOut()" title="Zoom out (Ctrl/Cmd + -)">−</button>
     <span class="zoom-level" id="zoom-level" title="Current zoom level. Ctrl/Cmd + 0 to reset">100%</span>
@@ -5292,7 +5292,7 @@ var healthStream = null;
 function startHealthStream() {
   if (window.CLOUD_MODE) return;
   if (healthStream) healthStream.close();
-  healthStream = new EventSource('/api/health-stream' + (localStorage.getItem('clawmetry-token') ? '?token=' + encodeURIComponent(localStorage.getItem('clawmetry-token')) : ''));
+  healthStream = new EventSource('/api/health-stream' + (localStorage.getItem('clawtelemetry-token') ? '?token=' + encodeURIComponent(localStorage.getItem('clawtelemetry-token')) : ''));
   healthStream.onmessage = function(e) {
     try {
       var data = JSON.parse(e.data);
@@ -5727,7 +5727,7 @@ function startLogStream() {
   if (window.CLOUD_MODE) return;
   if (logStream) logStream.close();
   streamBuffer = [];
-  logStream = new EventSource('/api/logs-stream' + (localStorage.getItem('clawmetry-token') ? '?token=' + encodeURIComponent(localStorage.getItem('clawmetry-token')) : ''));
+  logStream = new EventSource('/api/logs-stream' + (localStorage.getItem('clawtelemetry-token') ? '?token=' + encodeURIComponent(localStorage.getItem('clawtelemetry-token')) : ''));
   logStream.onmessage = function(e) {
     var data = JSON.parse(e.data);
     streamBuffer.push(data.line);
@@ -8602,7 +8602,7 @@ function finishBootOverlay() {
 async function bootDashboard() {
   // Check auth first -- if not valid, show login and abort boot
   try {
-    var stored = localStorage.getItem('clawmetry-token');
+    var stored = localStorage.getItem('clawtelemetry-token');
     var authRes = await fetch('/api/auth/check' + (stored ? '?token=' + encodeURIComponent(stored) : ''));
     var authData = await authRes.json();
     if (authData.needsSetup) {
@@ -8907,7 +8907,7 @@ async function showSnapshot(ts) {
   <div style="background:var(--bg-secondary, #1a1a2e); border:1px solid var(--border-primary, #333); border-radius:16px; padding:40px; max-width:440px; width:90%; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.5); position:relative;">
     <button id="gw-setup-close" onclick="document.getElementById('gw-setup-overlay').style.display='none'" style="display:none; position:absolute; top:12px; right:16px; background:none; border:none; color:var(--text-muted, #888); font-size:22px; cursor:pointer; padding:4px 8px; line-height:1;">✕</button>
     <div style="font-size:48px; margin-bottom:16px;">🦞</div>
-    <h2 style="color:var(--text-primary, #fff); margin:0 0 8px; font-size:24px; font-weight:700;">ClawMetry Setup</h2>
+    <h2 style="color:var(--text-primary, #fff); margin:0 0 8px; font-size:24px; font-weight:700;">ClawTelemetry Setup</h2>
     <p style="color:var(--text-muted, #888); margin:0 0 24px; font-size:14px;">Enter your OpenClaw gateway token to connect.</p>
     <input id="gw-token-input" type="password" placeholder="Paste your gateway token" 
       style="width:100%; padding:12px 16px; border:1px solid var(--border-primary, #444); border-radius:8px; background:var(--bg-primary, #111); color:var(--text-primary, #fff); font-size:14px; font-family:monospace; box-sizing:border-box; outline:none; margin-bottom:8px;"
@@ -8920,7 +8920,7 @@ async function showSnapshot(ts) {
       style="width:100%; padding:12px; border:none; border-radius:8px; background:var(--bg-accent, #0f6fff); color:#fff; font-size:15px; font-weight:600; cursor:pointer; font-family:Manrope,sans-serif;">
       Connect
     </button>
-    <p style="color:var(--text-faint, #555); font-size:11px; margin:16px 0 0;">Token is stored locally on this ClawMetry instance.</p>
+    <p style="color:var(--text-faint, #555); font-size:11px; margin:16px 0 0;">Token is stored locally on this ClawTelemetry instance.</p>
   </div>
 </div>
 
@@ -8933,8 +8933,8 @@ async function checkGwConfig() {
     var urlToken = urlParams.get('token');
     if (urlToken && urlToken.trim()) {
       urlToken = urlToken.trim();
-      localStorage.setItem('clawmetry-gw-token', urlToken);
-      localStorage.setItem('clawmetry-token', urlToken);
+      localStorage.setItem('clawtelemetry-gw-token', urlToken);
+      localStorage.setItem('clawtelemetry-token', urlToken);
       var tr = await fetch('/api/gw/config', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -8954,7 +8954,7 @@ async function checkGwConfig() {
     const d = await r.json();
     if (!d.configured) {
       // Check localStorage first
-      const saved = localStorage.getItem('clawmetry-gw-token');
+      const saved = localStorage.getItem('clawtelemetry-gw-token');
       if (saved) {
         // Try auto-connecting with saved token
         const r2 = await fetch('/api/gw/config', {
@@ -9004,8 +9004,8 @@ async function gwSetupConnect() {
     if (d.ok) {
       statusEl.textContent = 'Connected to ' + d.url;
       btn.textContent = 'Connected!';
-      localStorage.setItem('clawmetry-gw-token', token);
-      localStorage.setItem('clawmetry-token', token);
+      localStorage.setItem('clawtelemetry-gw-token', token);
+      localStorage.setItem('clawtelemetry-token', token);
       updateGwStatus(true, d.url);
       setTimeout(() => {
         document.getElementById('gw-setup-overlay').style.display = 'none';
@@ -9069,7 +9069,7 @@ import urllib.request as _urllib_req
 import urllib.error as _urllib_err
 import uuid as _uuid
 
-_GW_CONFIG_FILE = os.path.expanduser('~/.clawmetry-gateway.json')
+_GW_CONFIG_FILE = os.path.expanduser('~/.clawtelemetry-gateway.json')
 
 # ── WebSocket RPC Client ────────────────────────────────────────────────
 _ws_client = None
@@ -9097,11 +9097,11 @@ def _gw_ws_connect(url=None, token=None):
         ws.recv()
         # Send connect
         connect_msg = {
-            'type': 'req', 'id': 'clawmetry-connect', 'method': 'connect',
+            'type': 'req', 'id': 'clawtelemetry-connect', 'method': 'connect',
             'params': {
                 'minProtocol': 3, 'maxProtocol': 3,
                 'client': {'id': 'cli', 'version': __version__, 'platform': _CURRENT_PLATFORM,
-                           'mode': 'cli', 'instanceId': f'clawmetry-{_uuid.uuid4().hex[:8]}'},
+                           'mode': 'cli', 'instanceId': f'clawtelemetry-{_uuid.uuid4().hex[:8]}'},
                 'role': 'operator', 'scopes': ['operator.admin'],
                 'auth': {'token': tok},
             }
@@ -9110,7 +9110,7 @@ def _gw_ws_connect(url=None, token=None):
         # Wait for connect response
         for _ in range(5):
             r = json.loads(ws.recv())
-            if r.get('type') == 'res' and r.get('id') == 'clawmetry-connect':
+            if r.get('type') == 'res' and r.get('id') == 'clawtelemetry-connect':
                 if r.get('ok'):
                     _ws_client = ws
                     _ws_connected = True
@@ -9272,7 +9272,7 @@ bp_usage = _Blueprint('usage', __name__)
 
 def _register_blueprints_once():
     """Register all blueprints exactly once, even if detect_config() is called repeatedly."""
-    if getattr(app, '_clawmetry_blueprints_registered', False):
+    if getattr(app, '_clawtelemetry_blueprints_registered', False):
         return
 
     # Registration order is intentionally fixed for predictable startup behavior.
@@ -9294,7 +9294,7 @@ def _register_blueprints_once():
     app.register_blueprint(bp_overview)
     app.register_blueprint(bp_sessions)
     app.register_blueprint(bp_usage)
-    app._clawmetry_blueprints_registered = True
+    app._clawtelemetry_blueprints_registered = True
 
 @bp_gateway.route('/api/gw/config', methods=['GET', 'POST'])
 def api_gw_config():
@@ -9332,7 +9332,7 @@ def api_gw_config():
                     'params': {
                         'minProtocol': 3, 'maxProtocol': 3,
                         'client': {'id': 'cli', 'version': __version__, 'platform': _CURRENT_PLATFORM,
-                                   'mode': 'cli', 'instanceId': 'clawmetry-validate'},
+                                   'mode': 'cli', 'instanceId': 'clawtelemetry-validate'},
                         'role': 'operator', 'scopes': ['operator.admin'],
                         'auth': {'token': token},
                     }
@@ -9462,7 +9462,7 @@ def _auto_discover_gateway(token):
                 'params': {
                     'minProtocol': 3, 'maxProtocol': 3,
                     'client': {'id': 'cli', 'version': __version__, 'platform': _CURRENT_PLATFORM,
-                               'mode': 'cli', 'instanceId': 'clawmetry-discover'},
+                               'mode': 'cli', 'instanceId': 'clawtelemetry-discover'},
                     'role': 'operator', 'scopes': ['operator.admin'],
                     'auth': {'token': token},
                 }
@@ -9556,8 +9556,8 @@ def auth_token():
 <body style="background:#0b0f1a;color:#e2e8f0;font-family:sans-serif;padding:40px;min-height:100vh;">
 <p>Authenticating...</p>
 <script>
-  localStorage.setItem('clawmetry-token', '{token}');
-  localStorage.setItem('clawmetry-gw-token', '{token}');
+  localStorage.setItem('clawtelemetry-token', '{token}');
+  localStorage.setItem('clawtelemetry-gw-token', '{token}');
   window.location.href = '/';
 </script>
 </body></html>"""
@@ -10469,7 +10469,7 @@ def otlp_metrics():
     if not _HAS_OTEL_PROTO:
         return jsonify({
             'error': 'opentelemetry-proto not installed',
-            'message': 'Install OTLP support: pip install clawmetry[otel]  '
+            'message': 'Install OTLP support deps: pip install opentelemetry-proto protobuf  '
                        'or: pip install opentelemetry-proto protobuf',
         }), 501
 
@@ -10489,7 +10489,7 @@ def otlp_traces():
     if not _HAS_OTEL_PROTO:
         return jsonify({
             'error': 'opentelemetry-proto not installed',
-            'message': 'Install OTLP support: pip install clawmetry[otel]  '
+            'message': 'Install OTLP support deps: pip install opentelemetry-proto protobuf  '
                        'or: pip install opentelemetry-proto protobuf',
         }), 501
 
@@ -10524,7 +10524,7 @@ FLEET_HTML = r"""
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ClawMetry Fleet</title>
+<title>ClawTelemetry Fleet</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -10566,7 +10566,7 @@ FLEET_HTML = r"""
 <body>
 <div class="header">
   <a href="/" class="back">< Dashboard</a>
-  <h1><span>ClawMetry</span> Fleet</h1>
+  <h1><span>ClawTelemetry</span> Fleet</h1>
 </div>
 <div class="summary" id="summary"></div>
 <div class="search"><input type="text" id="search" placeholder="Search nodes..." oninput="filterNodes()"></div>
@@ -10850,7 +10850,7 @@ def api_budget_test_telegram():
         url = f'https://api.telegram.org/bot{token}/sendMessage'
         payload = json.dumps({
             'chat_id': chat_id,
-            'text': '\u2705 *ClawMetry Budget Alerts* - Test notification successful!',
+            'text': '\u2705 *ClawTelemetry Budget Alerts* - Test notification successful!',
             'parse_mode': 'Markdown',
         }).encode()
         req = urllib.request.Request(url, data=payload, headers={'Content-Type': 'application/json'})
@@ -14228,7 +14228,7 @@ def api_health():
                        'detail': 'OTLP ready - no data received yet'})
     else:
         checks.append({'id': 'otel', 'status': 'warning', 'color': 'yellow',
-                       'detail': 'Not installed - pip install clawmetry[otel]'})
+                       'detail': 'Not installed - pip install opentelemetry-proto protobuf'})
 
     return jsonify({'checks': checks})
 
@@ -15166,7 +15166,7 @@ BANNER = r"""
                                                 |___/
                           v{version}
 
-  [ClawMetry]  See your agent think
+  [ClawTelemetry]  See your agent think
 
   Tabs: Overview ? ? Usage ? Sessions ? Crons ? Logs
         Memory ? ? Transcripts ? ? Flow
@@ -15174,28 +15174,28 @@ BANNER = r"""
 """
 
 ARCHITECTURE_OVERVIEW = """\
-🦞 ClawMetry {version} -- See your agent think.
+🦞 ClawTelemetry {version} -- See your agent think.
 
   ┌─────────────────────┐              ┌─────────────────────┐              ┌─────────────────────┐
   │  🤖                 │  READS FILES │  🦞                 │  SHOWS YOU  │  📊                 │
   │  Your OpenClaw      │ ──────────->  │                     │ ──────────->  │                     │
-  │  agents             │              │  ClawMetry          │              │  Your browser       │
+  │  agents             │              │  ClawTelemetry          │              │  Your browser       │
   │                     │              │  Parses logs +      │              │  localhost:{port}   │
   │  Running normally.  │              │  sessions.          │              │  Live dashboard     │
   │  Nothing changes.   │              │  Serves dashboard.  │              │                     │
   └─────────────────────┘              └─────────────────────┘              └─────────────────────┘
 
   Runs locally on the same machine as OpenClaw. Your data never leaves your box.
-  Docs: https://clawmetry.com/how-it-works
+  Docs: https://github.com/plgonzalezrx8/clawtelemetry/tree/main/docs
 """
 
 HELP_TEXT = """\
-🦞 ClawMetry {version} -- See your agent think.
+🦞 ClawTelemetry {version} -- See your agent think.
 
-Usage: clawmetry [command] [options]
+Usage: clawtelemetry [command] [options]
 
 Commands:
-  start          Start ClawMetry as a background service (auto-starts on login)
+  start          Start ClawTelemetry as a background service (auto-starts on login)
   stop           Stop the background service
   restart        Restart the background service
   status         Show service status, port, and uptime
@@ -15211,17 +15211,17 @@ Options:
   -h, --help           Show this help
 
 Examples:
-  clawmetry start              Start as background service on port 8900
-  clawmetry start --port 9000  Start on custom port
-  clawmetry status             Check if running
+  clawtelemetry start              Start as background service on port 8900
+  clawtelemetry start --port 9000  Start on custom port
+  clawtelemetry status             Check if running
 
-Docs: https://docs.clawmetry.com
+Docs: https://github.com/plgonzalezrx8/clawtelemetry/tree/main/docs
 """
 
-PID_FILE = '/tmp/clawmetry.pid'
-LAUNCHD_LABEL = 'com.clawmetry'
+PID_FILE = '/tmp/clawtelemetry.pid'
+LAUNCHD_LABEL = 'com.clawtelemetry'
 LAUNCHD_PLIST = os.path.expanduser(f'~/Library/LaunchAgents/{LAUNCHD_LABEL}.plist')
-SYSTEMD_SERVICE = os.path.expanduser('~/.config/systemd/user/clawmetry.service')
+SYSTEMD_SERVICE = os.path.expanduser('~/.config/systemd/user/clawtelemetry.service')
 
 
 # ---------------------------------------------------------------------------
@@ -15229,9 +15229,9 @@ SYSTEMD_SERVICE = os.path.expanduser('~/.config/systemd/user/clawmetry.service')
 # ---------------------------------------------------------------------------
 
 def _get_script_path():
-    """Return absolute path to the clawmetry executable / this script."""
+    """Return absolute path to the clawtelemetry executable / this script."""
     import shutil
-    exe = shutil.which('clawmetry')
+    exe = shutil.which('clawtelemetry')
     if exe:
         return os.path.realpath(exe)
     return os.path.realpath(sys.argv[0])
@@ -15282,7 +15282,7 @@ def _systemd_running():
     import subprocess
     try:
         result = subprocess.run(
-            ['systemctl', '--user', 'is-active', '--quiet', 'clawmetry'],
+            ['systemctl', '--user', 'is-active', '--quiet', 'clawtelemetry'],
             capture_output=True
         )
         return result.returncode == 0
@@ -15324,7 +15324,7 @@ def _get_service_pid():
         import subprocess
         try:
             result = subprocess.run(
-                ['systemctl', '--user', 'show', 'clawmetry', '--property=MainPID'],
+                ['systemctl', '--user', 'show', 'clawtelemetry', '--property=MainPID'],
                 capture_output=True, text=True
             )
             for line in result.stdout.splitlines():
@@ -15360,7 +15360,7 @@ def _read_cloud_token():
     try:
         with open(cfg_path) as f:
             data = json.load(f)
-        return data.get('clawmetry', {}).get('cloudToken')
+        return data.get('clawtelemetry', {}).get('cloudToken')
     except Exception:
         return None
 
@@ -15372,15 +15372,15 @@ def _write_cloud_token(token):
             data = json.load(f)
     except Exception:
         data = {}
-    if 'clawmetry' not in data:
-        data['clawmetry'] = {}
-    data['clawmetry']['cloudToken'] = token
+    if 'clawtelemetry' not in data:
+        data['clawtelemetry'] = {}
+    data['clawtelemetry']['cloudToken'] = token
     os.makedirs(os.path.dirname(cfg_path), exist_ok=True)
     with open(cfg_path, 'w') as f:
         json.dump(data, f, indent=2)
 
 
-def _build_plist(python_exe, script_path, port, host, log_path='/tmp/clawmetry.log'):
+def _build_plist(python_exe, script_path, port, host, log_path='/tmp/clawtelemetry.log'):
     extra = []
     if host != '127.0.0.1':
         extra += ['<string>--host</string>', f'<string>{host}</string>']
@@ -15415,7 +15415,7 @@ def _build_plist(python_exe, script_path, port, host, log_path='/tmp/clawmetry.l
 def _build_systemd_unit(python_exe, script_path, port, host):
     extra = f' --host {host}' if host != '127.0.0.1' else ''
     return f"""[Unit]
-Description=ClawMetry Dashboard
+Description=ClawTelemetry Dashboard
 After=network.target
 
 [Service]
@@ -15433,7 +15433,7 @@ WantedBy=default.target
 # ---------------------------------------------------------------------------
 
 def cmd_start(args):
-    """Start ClawMetry as a background daemon."""
+    """Start ClawTelemetry as a background daemon."""
     import subprocess
     port = args.port
     host = args.host
@@ -15467,7 +15467,7 @@ def cmd_start(args):
                 _r = _sp.run(['ps', '-p', str(_old_pid), '-o', 'command='],
                              capture_output=True, text=True)
                 _cmd = _r.stdout
-                if 'clawmetry' in _cmd or 'dashboard.py' in _cmd:
+                if 'clawtelemetry' in _cmd or 'dashboard.py' in _cmd:
                     import signal as _signal
                     os.kill(_old_pid, _signal.SIGTERM)
                     import time as _time; _time.sleep(1)
@@ -15499,11 +15499,11 @@ def cmd_start(args):
         import time
         time.sleep(1)
         if _launchd_running():
-            print(f"[ok] ClawMetry started  ->  http://localhost:{port}")
-            print(f"   Auto-starts on login - logs: /tmp/clawmetry.log")
-            print(f"   Stop with: clawmetry stop")
+            print(f"[ok] ClawTelemetry started  ->  http://localhost:{port}")
+            print(f"   Auto-starts on login - logs: /tmp/clawtelemetry.log")
+            print(f"   Stop with: clawtelemetry stop")
         else:
-            print("[warn]  Service loaded but may still be starting. Check: clawmetry status")
+            print("[warn]  Service loaded but may still be starting. Check: clawtelemetry status")
 
     elif _is_linux():
         unit_content = _build_systemd_unit(python_exe, script_path, port, host)
@@ -15512,8 +15512,8 @@ def cmd_start(args):
             f.write(unit_content)
 
         subprocess.run(['systemctl', '--user', 'daemon-reload'], capture_output=True)
-        subprocess.run(['systemctl', '--user', 'enable', 'clawmetry'], capture_output=True)
-        result = subprocess.run(['systemctl', '--user', 'restart', 'clawmetry'],
+        subprocess.run(['systemctl', '--user', 'enable', 'clawtelemetry'], capture_output=True)
+        result = subprocess.run(['systemctl', '--user', 'restart', 'clawtelemetry'],
                                 capture_output=True, text=True)
         if result.returncode != 0:
             print(f"❌ Failed to start service: {result.stderr.strip()}")
@@ -15522,34 +15522,34 @@ def cmd_start(args):
         import time
         time.sleep(1)
         if _systemd_running():
-            print(f"[ok] ClawMetry started  ->  http://localhost:{port}")
-            print(f"   Auto-starts on login - logs: journalctl --user -u clawmetry -f")
-            print(f"   Stop with: clawmetry stop")
+            print(f"[ok] ClawTelemetry started  ->  http://localhost:{port}")
+            print(f"   Auto-starts on login - logs: journalctl --user -u clawtelemetry -f")
+            print(f"   Stop with: clawtelemetry stop")
         else:
-            print("[warn]  Service started but may still be initialising. Check: clawmetry status")
+            print("[warn]  Service started but may still be initialising. Check: clawtelemetry status")
     else:
         print("[warn]  Daemon mode not supported on this OS. Running in foreground instead.")
         _run_server(args)
 
 
 def cmd_stop(args):
-    """Stop the ClawMetry daemon."""
+    """Stop the ClawTelemetry daemon."""
     import subprocess
     if _is_macos():
         if not os.path.exists(LAUNCHD_PLIST):
-            print("ℹ️  No service file found. ClawMetry may not be installed as a service.")
+            print("ℹ️  No service file found. ClawTelemetry may not be installed as a service.")
             sys.exit(0)
         result = subprocess.run(['launchctl', 'unload', LAUNCHD_PLIST],
                                 capture_output=True, text=True)
         if result.returncode == 0:
-            print("[ok] ClawMetry stopped.")
+            print("[ok] ClawTelemetry stopped.")
         else:
             print(f"[warn]  {result.stderr.strip() or 'Service may already be stopped.'}")
     elif _is_linux():
-        result = subprocess.run(['systemctl', '--user', 'stop', 'clawmetry'],
+        result = subprocess.run(['systemctl', '--user', 'stop', 'clawtelemetry'],
                                 capture_output=True, text=True)
         if result.returncode == 0:
-            print("[ok] ClawMetry stopped.")
+            print("[ok] ClawTelemetry stopped.")
         else:
             print(f"[warn]  {result.stderr.strip() or 'Service may already be stopped.'}")
     else:
@@ -15559,29 +15559,29 @@ def cmd_stop(args):
             os.kill(pid, 15)  # SIGTERM
             print(f"[ok] Sent SIGTERM to PID {pid}.")
         else:
-            print("ℹ️  No running ClawMetry process found.")
+            print("ℹ️  No running ClawTelemetry process found.")
 
 
 def cmd_restart(args):
-    """Restart the ClawMetry daemon."""
+    """Restart the ClawTelemetry daemon."""
     import subprocess
     if _is_macos():
         if not os.path.exists(LAUNCHD_PLIST):
-            print("ℹ️  No service installed. Use: clawmetry start")
+            print("ℹ️  No service installed. Use: clawtelemetry start")
             sys.exit(1)
         subprocess.run(['launchctl', 'unload', LAUNCHD_PLIST], capture_output=True)
         result = subprocess.run(['launchctl', 'load', LAUNCHD_PLIST],
                                 capture_output=True, text=True)
         if result.returncode == 0:
-            print("[ok] ClawMetry restarted.")
+            print("[ok] ClawTelemetry restarted.")
         else:
             print(f"❌ {result.stderr.strip()}")
             sys.exit(1)
     elif _is_linux():
-        result = subprocess.run(['systemctl', '--user', 'restart', 'clawmetry'],
+        result = subprocess.run(['systemctl', '--user', 'restart', 'clawtelemetry'],
                                 capture_output=True, text=True)
         if result.returncode == 0:
-            print("[ok] ClawMetry restarted.")
+            print("[ok] ClawTelemetry restarted.")
         else:
             print(f"❌ {result.stderr.strip()}")
             sys.exit(1)
@@ -15590,7 +15590,7 @@ def cmd_restart(args):
 
 
 def cmd_status(args):
-    """Show ClawMetry service status."""
+    """Show ClawTelemetry service status."""
     running = _service_running()
     pid = _get_service_pid() if running else None
     uptime = _get_uptime_str(pid) if pid else '--'
@@ -15608,7 +15608,7 @@ def cmd_status(args):
     cloud_status = f'[ok] Connected' if token else '❌ Not connected'
 
     print(f"""
-🦞 ClawMetry Status
+🦞 ClawTelemetry Status
 
   Service:   {status_icon} ({svc_type})
   Port:      {port}
@@ -15621,11 +15621,11 @@ def cmd_status(args):
 
 
 def cmd_connect(args):
-    """Connect to ClawMetry Cloud."""
+    """Connect to ClawTelemetry Cloud."""
     print()
-    print("🦞 ClawMetry Cloud Connect")
+    print("🦞 ClawTelemetry Cloud Connect")
     print()
-    print("  1. Go to: https://clawmetry.com/connect")
+    print("  1. Configure CLAWTELEMETRY_INGEST_URL for your backend")
     print("  2. Sign in and copy your API key (starts with cm_)")
     print()
     try:
@@ -15640,14 +15640,14 @@ def cmd_connect(args):
 
     _write_cloud_token(token)
     print()
-    print("[ok] Connected! View your agent at: https://app.clawmetry.com")
+    print("[ok] Connected. Cloud sync is active for this node.")
     print()
 
 
 def cmd_uninstall(args):
-    """Stop and remove the ClawMetry service."""
+    """Stop and remove the ClawTelemetry service."""
     import subprocess
-    print("🗑️  Uninstalling ClawMetry service...")
+    print("🗑️  Uninstalling ClawTelemetry service...")
 
     if _is_macos():
         if os.path.exists(LAUNCHD_PLIST):
@@ -15657,8 +15657,8 @@ def cmd_uninstall(args):
         else:
             print("  No launchd service found.")
     elif _is_linux():
-        subprocess.run(['systemctl', '--user', 'stop', 'clawmetry'], capture_output=True)
-        subprocess.run(['systemctl', '--user', 'disable', 'clawmetry'], capture_output=True)
+        subprocess.run(['systemctl', '--user', 'stop', 'clawtelemetry'], capture_output=True)
+        subprocess.run(['systemctl', '--user', 'disable', 'clawtelemetry'], capture_output=True)
         if os.path.exists(SYSTEMD_SERVICE):
             os.remove(SYSTEMD_SERVICE)
             print(f"  Removed: {SYSTEMD_SERVICE}")
@@ -15670,7 +15670,7 @@ def cmd_uninstall(args):
     if os.path.exists(PID_FILE):
         os.remove(PID_FILE)
 
-    print("[ok] ClawMetry service removed.")
+    print("[ok] ClawTelemetry service removed.")
 
 
 def _run_server(args):
@@ -15734,7 +15734,7 @@ def _run_server(args):
 
     global _history_db, _history_collector
     if _HAS_HISTORY:
-        history_db_path = os.environ.get('CLAWMETRY_HISTORY_DB', None)
+        history_db_path = os.environ.get('CLAWTELEMETRY_HISTORY_DB', None)
         _history_db = HistoryDB(history_db_path)
         _history_collector = HistoryCollector(_history_db, _gw_invoke)
         _history_collector.start()
@@ -15790,7 +15790,7 @@ def _run_server(args):
         print(f"  -> OTLP endpoint: http://{local_ip}:{args.port}/v1/metrics")
     print()
     if not args.debug:
-        print(f"  Tip: run as background service with: clawmetry start")
+        print(f"  Tip: run as background service with: clawtelemetry start")
         print()
 
     if args.debug:
@@ -15812,7 +15812,7 @@ def _run_server(args):
 def _init_data_provider():
     """Phase 3: Initialize the active DataProvider after path detection."""
     try:
-        from clawmetry.providers import init_providers
+        from clawtelemetry.providers import init_providers
         return init_providers(
             sessions_dir=SESSIONS_DIR or '',
             log_dir=LOG_DIR or '',
@@ -15851,7 +15851,7 @@ def main():
     # Top-level parser
     # -----------------------------------------------------------------------
     parser = argparse.ArgumentParser(
-        prog='clawmetry',
+        prog='clawtelemetry',
         description=HELP_TEXT.format(version=__version__),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         parents=[shared],
@@ -15860,7 +15860,7 @@ def main():
         def __call__(self, parser, namespace, values, option_string=None):
             try:
                 import sys
-                sys.stdout.write(f'clawmetry {__version__}\n')
+                sys.stdout.write(f'clawtelemetry {__version__}\n')
                 sys.stdout.flush()
             except Exception:
                 pass
@@ -15869,36 +15869,36 @@ def main():
 
     subparsers = parser.add_subparsers(dest='command', metavar='command')
 
-    # clawmetry start
+    # clawtelemetry start
     p_start = subparsers.add_parser('start', parents=[shared], add_help=True,
-                                    help='Start ClawMetry as a background service')
+                                    help='Start ClawTelemetry as a background service')
 
-    # clawmetry stop
+    # clawtelemetry stop
     p_stop = subparsers.add_parser('stop', parents=[shared], add_help=True,
                                    help='Stop the background service')
 
-    # clawmetry restart
+    # clawtelemetry restart
     p_restart = subparsers.add_parser('restart', parents=[shared], add_help=True,
                                       help='Restart the background service')
 
-    # clawmetry status
+    # clawtelemetry status
     p_status = subparsers.add_parser('status', parents=[shared], add_help=True,
                                      help='Show service status, port, and uptime')
 
-    # clawmetry connect
+    # clawtelemetry connect
     p_connect = subparsers.add_parser('connect', parents=[shared], add_help=True,
                                       help=argparse.SUPPRESS)
 
-    # clawmetry uninstall
+    # clawtelemetry uninstall
     p_uninstall = subparsers.add_parser('uninstall', parents=[shared], add_help=True,
                                         help='Remove the background service')
 
-    # clawmetry help (alias)
+    # clawtelemetry help (alias)
     subparsers.add_parser('help', add_help=True, help='Show this help message')
 
     args = parser.parse_args()
 
-    # "clawmetry help" -> print help and exit
+    # "clawtelemetry help" -> print help and exit
     if args.command == 'help':
         try:
             parser.print_help()

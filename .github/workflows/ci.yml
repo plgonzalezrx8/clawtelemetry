@@ -12,6 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Guard legacy brand residue
+        run: |
+          if rg -n "clawmetry|Clawmetry|ClawMetry|CLAWMETRY" . --glob '!.git/*' --glob '!LICENSE' --glob '!CHANGELOG.md' --glob '!DEV-DOCS/**'; then
+            echo "Legacy brand token detected outside allowlist."
+            exit 1
+          fi
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -86,8 +92,8 @@ jobs:
 
       - name: Run API tests
         env:
-          CLAWMETRY_URL: http://localhost:8900
-          CLAWMETRY_TOKEN: ci-test-token
+          CLAWTELEMETRY_URL: http://localhost:8900
+          CLAWTELEMETRY_TOKEN: ci-test-token
         run: python3 -m pytest tests/test_api.py -v --tb=short
 
   # ── E2E Playwright tests (Linux only for speed, allowed to fail) ──────────
@@ -115,8 +121,8 @@ jobs:
           done
       - name: Run E2E tests
         env:
-          CLAWMETRY_URL: http://localhost:8900
-          CLAWMETRY_TOKEN: ci-test-token
+          CLAWTELEMETRY_URL: http://localhost:8900
+          CLAWTELEMETRY_TOKEN: ci-test-token
         run: python3 -m pytest tests/test_e2e.py -v --tb=short
 
   # ── pip install smoke test across platforms ───────────────────────────────

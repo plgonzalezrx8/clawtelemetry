@@ -6,13 +6,13 @@ dev:
 test: test-api test-e2e
 
 test-fast:
-	CLAWMETRY_URL=http://localhost:8900 CLAWMETRY_TOKEN=dev-token python3 -m pytest tests/test_api.py -v
+	CLAWTELEMETRY_URL=http://localhost:8900 CLAWTELEMETRY_TOKEN=dev-token python3 -m pytest tests/test_api.py -v
 
 test-api:
-	CLAWMETRY_URL=http://localhost:8900 CLAWMETRY_TOKEN=dev-token python3 -m pytest tests/test_api.py -v
+	CLAWTELEMETRY_URL=http://localhost:8900 CLAWTELEMETRY_TOKEN=dev-token python3 -m pytest tests/test_api.py -v
 
 test-e2e:
-	CLAWMETRY_URL=http://localhost:8900 CLAWMETRY_TOKEN=dev-token python3 -m pytest tests/test_e2e.py -v
+	CLAWTELEMETRY_URL=http://localhost:8900 CLAWTELEMETRY_TOKEN=dev-token python3 -m pytest tests/test_e2e.py -v
 
 lint:
 	python3 -c "import ast; ast.parse(open('dashboard.py').read()); print('Syntax OK')"

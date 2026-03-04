@@ -14,7 +14,7 @@ pytest-playwright>=0.5
 requests>=2.28
 
 # Optional: enables real-time OTLP metrics from OpenClaw
-# Install with: pip install clawmetry[otel]
+# Install with: pip install clawtelemetry[otel]
 # opentelemetry-proto>=1.20.0
 # protobuf>=4.21.0
 
@@ -23,8 +23,8 @@ setup.py install_requires excerpt:
 28:    extras_require={
 31:    entry_points={
 
-packages/clawmetry/setup.py excerpt:
-7:    name="clawmetry",
+packages/clawtelemetry/setup.py excerpt:
+7:    name="clawtelemetry",
 8:    version="0.1.0",
 14:    url="https://github.com/vivekchand/openclaw-dashboard",
 16:    install_requires=[

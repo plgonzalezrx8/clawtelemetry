@@ -7,8 +7,8 @@ import time
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
 
-from clawmetry.providers.base import (
-    ClawMetryDataProvider, Event, LogEntry, MemoryFile, MetricPoint, Session
+from clawtelemetry.providers.base import (
+    ClawTelemetryDataProvider, Event, LogEntry, MemoryFile, MetricPoint, Session
 )
 
 _MEMORY_FILE_NAMES = [
@@ -17,7 +17,7 @@ _MEMORY_FILE_NAMES = [
 ]
 
 
-class LocalDataProvider(ClawMetryDataProvider):
+class LocalDataProvider(ClawTelemetryDataProvider):
     """
     Reads data directly from local OpenClaw filesystem paths.
     Mirrors existing dashboard.py file-reading behavior exactly.

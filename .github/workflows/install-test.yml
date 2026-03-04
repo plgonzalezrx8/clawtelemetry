@@ -9,26 +9,35 @@ on:
 jobs:
   test-linux:
     runs-on: ubuntu-latest
+    env:
+      CLAWTELEMETRY_REF: ${{ github.sha }}
+      CLAWTELEMETRY_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
       - name: Run install script
         run: bash install.sh
-      - name: Verify clawmetry binary
-        run: clawmetry --version
+      - name: Verify clawtelemetry binary
+        run: clawtelemetry --version
 
   test-macos:
     runs-on: macos-latest
+    env:
+      CLAWTELEMETRY_REF: ${{ github.sha }}
+      CLAWTELEMETRY_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
       - name: Run install script
         run: bash install.sh
       - name: Add bin to PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-      - name: Verify clawmetry binary
-        run: clawmetry --version
+      - name: Verify clawtelemetry binary
+        run: clawtelemetry --version
 
   test-windows-ps:
     runs-on: windows-latest
+    env:
+      CLAWTELEMETRY_REF: ${{ github.sha }}
+      CLAWTELEMETRY_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -38,14 +47,17 @@ jobs:
       - name: Run PowerShell install
         shell: pwsh
         run: .\install.ps1
-      - name: Verify clawmetry binary
+      - name: Verify clawtelemetry binary
         shell: pwsh
         run: |
-          $env:PATH = "$env:LOCALAPPDATA\clawmetry\Scripts;$env:PATH"
-          clawmetry --version
+          $env:PATH = "$env:LOCALAPPDATA\clawtelemetry\Scripts;$env:PATH"
+          clawtelemetry --version
 
   test-windows-cmd:
     runs-on: windows-latest
+    env:
+      CLAWTELEMETRY_REF: ${{ github.sha }}
+      CLAWTELEMETRY_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -55,9 +67,9 @@ jobs:
       - name: Run CMD install
         shell: cmd
         run: install.cmd
-      - name: Verify clawmetry binary
+      - name: Verify clawtelemetry binary
         shell: cmd
-        run: clawmetry --version
+        run: clawtelemetry --version
 
   shellcheck:
     runs-on: ubuntu-latest

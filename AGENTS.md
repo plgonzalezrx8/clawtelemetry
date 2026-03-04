@@ -1,7 +1,7 @@
 # AGENTS.md — For AI Coding Agents
 
 ## Quick Context
-ClawMetry = open-source observability dashboard for OpenClaw AI agents. Single Python file, zero config, auto-detects everything.
+ClawTelemetry = open-source observability dashboard for OpenClaw AI agents. Single Python file, zero config, auto-detects everything.
 
 ## Rules
 - **Don't split dashboard.py** — the single-file architecture is a feature, not a bug
@@ -9,7 +9,7 @@ ClawMetry = open-source observability dashboard for OpenClaw AI agents. Single P
 - **Don't add a build step** — frontend is embedded in Python, no npm/webpack/vite
 - **Keep auto-detection working** — if you add a feature, it should work without config
 - **Performance matters** — this runs on Raspberry Pis. Keep it light (<100MB RAM)
-- **Read-only principle** — ClawMetry observes agents, it doesn't control them
+- **Read-only principle** — ClawTelemetry observes agents, it doesn't control them
 
 ## Common Tasks
 - **Add a new API endpoint**: Add `@app.route` in dashboard.py, follow existing patterns
@@ -17,8 +17,9 @@ ClawMetry = open-source observability dashboard for OpenClaw AI agents. Single P
 - **Add a new dashboard view**: Add route + template + navigation link
 - **Bump version**: Update `__version__` in dashboard.py and `setup.py`
 
-## Publishing to PyPI
-See `PUBLISH.md` in `packages/clawmetry/`
+## Publishing
+Use GitHub Releases only (no PyPI distribution in this repo).
+Tag format: `vX.Y.Z`, then publish release assets via `.github/workflows/publish.yml`.
 
 ## Don't
 - Don't introduce React/Vue/Angular — vanilla JS only

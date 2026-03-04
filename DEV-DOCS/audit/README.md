@@ -1,4 +1,4 @@
-# ClawMetry Engineering Audit Dossier
+# ClawTelemetry Engineering Audit Dossier
 
 ## Scope
 Engineering-core audit of:

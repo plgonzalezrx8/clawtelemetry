@@ -1,5 +1,5 @@
 import re
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
@@ -9,16 +9,15 @@ with open("dashboard.py", "r", encoding="utf-8") as f:
     version = re.search(r'__version__\s*=\s*"(.+?)"', f.read()).group(1)
 
 setup(
-    name="clawmetry",
+    name="clawtelemetry",
     version=version,
-    description="ClawMetry - Real-time observability dashboard for OpenClaw AI agents",
+    description="ClawTelemetry - Real-time observability dashboard for OpenClaw AI agents",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="Vivek Chand",
-    author_email="vivek@clawmetry.com",
-    url="https://github.com/vivekchand/clawmetry",
+    author="ClawTelemetry Contributors",
+    url="https://github.com/plgonzalezrx8/clawtelemetry",
     py_modules=["dashboard"],
-    packages=["clawmetry"],
+    packages=find_packages(include=["clawtelemetry", "clawtelemetry.*"]),
     python_requires=">=3.8",
     install_requires=[
         "flask>=2.0",
@@ -30,8 +29,8 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "clawmetry=clawmetry.cli:main",
-            # legacy: "clawmetry=dashboard:main",
+            "clawtelemetry=clawtelemetry.cli:main",
+            # legacy: "clawtelemetry=dashboard:main",
         ],
     },
     classifiers=[
@@ -47,11 +46,11 @@ setup(
         "Topic :: Software Development :: Quality Assurance",
         "Topic :: System :: Monitoring",
     ],
-    keywords="clawmetry openclaw moltbot dashboard observability ai agent monitoring opentelemetry",
+    keywords="clawtelemetry openclaw moltbot dashboard observability ai agent monitoring opentelemetry",
     license="MIT",
     project_urls={
-        "Homepage": "https://clawmetry.com",
-        "Bug Reports": "https://github.com/vivekchand/clawmetry/issues",
-        "Source": "https://github.com/vivekchand/clawmetry",
+        "Homepage": "https://github.com/plgonzalezrx8/clawtelemetry",
+        "Bug Reports": "https://github.com/plgonzalezrx8/clawtelemetry/issues",
+        "Source": "https://github.com/plgonzalezrx8/clawtelemetry",
     },
 )

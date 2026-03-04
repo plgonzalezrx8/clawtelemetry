@@ -1,5 +1,5 @@
 """
-ClawMetry API endpoint tests.
+ClawTelemetry API endpoint tests.
 
 Tests every API endpoint for:
 - Correct HTTP status (200)

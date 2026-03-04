@@ -1,4 +1,4 @@
-"""Abstract data provider interface for ClawMetry."""
+"""Abstract data provider interface for ClawTelemetry."""
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -53,12 +53,12 @@ class MetricPoint:
     labels: Dict[str, str] = field(default_factory=dict)
 
 
-class ClawMetryDataProvider(ABC):
+class ClawTelemetryDataProvider(ABC):
     """
-    Abstract data provider for ClawMetry.
+    Abstract data provider for ClawTelemetry.
 
     OSS ships LocalDataProvider (reads ~/.openclaw files directly).
-    Cloud implements TursoDataProvider in the private clawmetry-cloud package.
+    Cloud implements TursoDataProvider in the private clawtelemetry-cloud package.
 
     All methods are synchronous. Cloud providers use connection pooling internally.
     """
