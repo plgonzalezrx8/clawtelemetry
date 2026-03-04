@@ -12,7 +12,7 @@ Core local-first model is strong, but token handling and auth bootstrap flows ha
 - Likelihood: Medium
 - Affected files:
   - `dashboard.py` (gateway config handling)
-  - local runtime file `~/.clawmetry-gateway.json`
+  - local runtime file `~/.clawtelemetry-gateway.json`
 - Evidence:
   - gateway config file usage captured during audit (`../reports/runtime-probe-2026-03-04.txt` context)
 - Recommended fix:

@@ -39,8 +39,37 @@
   - `Makefile` `lint` target
 
 ### Validation
-- `python3 -m py_compile dashboard.py history.py clawmetry/*.py clawmetry/providers/*.py` -> pass
+- `python3 -m py_compile dashboard.py history.py clawtelemetry/*.py clawtelemetry/providers/*.py` -> pass
 - `python3 scripts/check_dashboard_duplicates.py dashboard.py` -> pass
 - isolated route registration probe (double `detect_config()` call) -> pass, 90 routes available
 - API suite on isolated port with explicit env token:
-  - `CLAWMETRY_URL=http://127.0.0.1:8933 CLAWMETRY_TOKEN=dev-token pytest -q tests/test_api.py -q` -> pass
+  - `CLAWTELEMETRY_URL=http://127.0.0.1:8933 CLAWTELEMETRY_TOKEN=dev-token pytest -q tests/test_api.py -q` -> pass
+
+---
+
+## 2026-03-04 - ClawTelemetry hard-cut rebrand + GitHub-only distribution
+
+### Completed
+- renamed package namespace directory from `clawmetry/` to `clawtelemetry/`
+- updated imports, env vars, local token keys, service IDs, and runtime paths to `clawtelemetry` naming
+- removed legacy alias package subtree under `packages/`
+- replaced PyPI publish workflow with GitHub Release asset workflow
+- rewrote install scripts (`install.sh`, `install.ps1`, `install.cmd`) to install from GitHub release/ref archives
+- updated root/docs/install guidance to GitHub-only installation commands
+- added CI guard step to fail if legacy brand token appears outside allowlist
+- removed `dashboard.py.bak` snapshot to avoid stale duplicate runtime and stale brand references
+
+### Validation
+- residue scan:
+  - `rg -n \"Clawmetry|clawmetry|CLAWMETRY\" . --glob '!.git/*' --glob '!LICENSE' --glob '!CHANGELOG.md'` -> no matches
+- syntax/import:
+  - `python3 -m compileall dashboard.py history.py clawtelemetry tests` -> pass
+  - `python3 -c \"import clawtelemetry, dashboard; print(clawtelemetry.__version__)\"` -> pass
+- runtime smoke:
+  - `OPENCLAW_GATEWAY_TOKEN=dev-token python3 dashboard.py --port 8911 --no-debug` + `/api/health` probe -> pass (HTTP 200)
+- API suite:
+  - default `python3 -m pytest tests/test_api.py -q` can fail if stale localhost server is already bound on port 8900
+  - isolated run `CLAWTELEMETRY_URL=http://127.0.0.1:8933 CLAWTELEMETRY_TOKEN=dev-token python3 -m pytest tests/test_api.py -q` -> pass (`45 passed, 5 skipped`)
+
+### Notes
+- channel endpoint failures in default runs are environment-contamination related (stale localhost server), not route-removal regressions.

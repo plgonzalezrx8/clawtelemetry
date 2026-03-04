@@ -1,19 +1,19 @@
 """
-ClawMetry extension/plugin system.
+ClawTelemetry extension/plugin system.
 
-Allows external packages (e.g. clawmetry-cloud) to hook into ClawMetry events
+Allows external packages (e.g. clawtelemetry-cloud) to hook into ClawTelemetry events
 without modifying this codebase.
 
 Usage (in an external package's pyproject.toml):
-    [project.entry-points."clawmetry.extensions"]
+    [project.entry-points."clawtelemetry.extensions"]
     mycloud = "mypkg.extensions:register_all"
 
 Usage (in dashboard.py):
-    from clawmetry.extensions import emit
+    from clawtelemetry.extensions import emit
     emit("session.snapshot", {"session_id": sid, "tokens": n})
 
 Registration:
-    from clawmetry.extensions import register
+    from clawtelemetry.extensions import register
     register("session.snapshot", my_handler)
 """
 from __future__ import annotations
@@ -23,7 +23,7 @@ import logging
 import threading
 from typing import Any, Callable, Dict, List
 
-logger = logging.getLogger("clawmetry.extensions")
+logger = logging.getLogger("clawtelemetry.extensions")
 
 _registry: Dict[str, List[Callable]] = {}
 _lock = threading.Lock()
@@ -71,7 +71,7 @@ def load_plugins() -> None:
     Called once at dashboard startup.
 
     Plugins declare themselves in pyproject.toml:
-        [project.entry-points."clawmetry.extensions"]
+        [project.entry-points."clawtelemetry.extensions"]
         myplugin = "mypkg.ext:register_all"
 
     The entry point value must be a callable that takes no arguments
@@ -83,7 +83,7 @@ def load_plugins() -> None:
     _loaded = True
 
     try:
-        eps = importlib.metadata.entry_points(group="clawmetry.extensions")
+        eps = importlib.metadata.entry_points(group="clawtelemetry.extensions")
     except Exception:
         return
 
@@ -91,7 +91,7 @@ def load_plugins() -> None:
         try:
             fn = ep.load()
             fn()
-            logger.info(f"Loaded ClawMetry extension plugin: {ep.name!r}")
+            logger.info(f"Loaded ClawTelemetry extension plugin: {ep.name!r}")
         except Exception as exc:
             logger.warning(f"Failed to load extension plugin {ep.name!r}: {exc}")
 

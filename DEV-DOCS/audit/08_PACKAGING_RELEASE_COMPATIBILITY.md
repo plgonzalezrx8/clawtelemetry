@@ -1,23 +1,22 @@
 # 08 Packaging, Release, and Compatibility
 
 ## Summary
-Primary packaging path is coherent, but legacy/alias packaging metadata appears stale and can cause confusion.
+Packaging has been converged to a single path with GitHub Release assets as the only public distribution channel.
 
 ## Findings
 
-### PKG-01 Dual setup.py paths have divergent metadata and versioning
+### PKG-01 Legacy dual-package path was removed
 - ID: `PKG-01`
-- Severity: `P2`
-- Impact: Maintainers and automation can target outdated package definitions accidentally.
-- Likelihood: Medium
+- Severity: `P3`
+- Impact: Risk addressed; no active dual-path package metadata remains.
+- Likelihood: Low
 - Affected files:
   - `setup.py`
-  - `packages/clawmetry/setup.py`
 - Evidence:
   - snapshot: `../reports/ci-packaging-snapshot-2026-03-04.txt`
-  - alias package references older naming/version strategy
+  - legacy package path removed in rebrand pass
 - Recommended fix:
-  - document authoritative build path and deprecate/align legacy alias package metadata
+  - maintain single authoritative build path (`setup.py`) and avoid reintroducing alias package wrappers
 
 ### PKG-02 Requirements and package install dependencies are not fully aligned
 - ID: `PKG-02`
@@ -32,14 +31,14 @@ Primary packaging path is coherent, but legacy/alias packaging metadata appears 
 - Recommended fix:
   - define explicit policy for dev vs package deps and document rationale in CONTRIBUTING
 
-### PKG-03 Release automation exists and should be preserved during cleanup
+### PKG-03 Release automation remains mandatory
 - ID: `PKG-03`
 - Severity: `P3`
-- Impact: Positive control; cleanup work could accidentally break publish path.
+- Impact: Positive control; future cleanup work could accidentally break release path.
 - Likelihood: Medium
 - Affected files:
   - `.github/workflows/publish.yml`
 - Evidence:
   - workflow snapshot in `../reports/ci-packaging-snapshot-2026-03-04.txt`
 - Recommended fix:
-  - include publish workflow smoke check in any packaging refactor PR
+  - include release workflow smoke check in any packaging refactor PR

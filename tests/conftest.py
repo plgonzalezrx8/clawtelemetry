@@ -1,5 +1,5 @@
 """
-Shared fixtures for ClawMetry test suite.
+Shared fixtures for ClawTelemetry test suite.
 """
 import os
 import sys
@@ -13,7 +13,7 @@ import requests
 def _detect_gateway_token():
     """Detect gateway token from OpenClaw config."""
     # Environment variable
-    token = os.environ.get("CLAWMETRY_TOKEN", "").strip()
+    token = os.environ.get("CLAWTELEMETRY_TOKEN", "").strip()
     if token:
         return token
 
@@ -32,7 +32,7 @@ def _detect_gateway_token():
 
 
 def _is_server_running(base_url, token=None):
-    """Check if the ClawMetry server is reachable."""
+    """Check if the ClawTelemetry server is reachable."""
     try:
         headers = {}
         if token:
@@ -43,7 +43,7 @@ def _is_server_running(base_url, token=None):
         return False
 
 
-BASE_URL = os.environ.get("CLAWMETRY_URL", "http://localhost:8900")
+BASE_URL = os.environ.get("CLAWTELEMETRY_URL", "http://localhost:8900")
 GATEWAY_TOKEN = _detect_gateway_token()
 
 
@@ -68,7 +68,7 @@ def api(base_url, token):
 
 @pytest.fixture(scope="session", autouse=True)
 def server(base_url, token):
-    """Ensure the ClawMetry server is running before tests."""
+    """Ensure the ClawTelemetry server is running before tests."""
     if _is_server_running(base_url, token):
         yield base_url
         return
@@ -100,7 +100,7 @@ def server(base_url, token):
     else:
         stderr_out = proc.stderr.read(2000) if proc.stderr else b""
         proc.terminate()
-        pytest.fail(f"ClawMetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
+        pytest.fail(f"ClawTelemetry server failed to start. stderr: {stderr_out.decode(errors='replace')}")
 
     yield base_url
 

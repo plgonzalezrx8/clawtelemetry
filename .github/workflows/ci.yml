@@ -12,6 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Guard legacy brand residue
+        run: |
+          if rg -n "clawmetry|Clawmetry|ClawMetry|CLAWMETRY" . --glob '!.git/*' --glob '!LICENSE' --glob '!CHANGELOG.md' --glob '!DEV-DOCS/**'; then
+            echo "Legacy brand token detected outside allowlist."
+            exit 1
+          fi
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -48,7 +54,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: pip install flask pytest requests
+        run: pip install flask pytest requests waitress
 
       - name: Start server (Unix)
         if: runner.os != 'Windows'
@@ -62,32 +68,43 @@ jobs:
 
       - name: Start server (Windows)
         if: runner.os == 'Windows'
+        timeout-minutes: 3
         run: |
           $env:OPENCLAW_GATEWAY_TOKEN = "ci-test-token"
           $env:PYTHONIOENCODING = "utf-8"
           $env:PYTHONUTF8 = "1"
-          Start-Process python -ArgumentList "-u -X utf8 dashboard.py --port 8900 --no-debug" -NoNewWindow -RedirectStandardOutput "server_out.txt" -RedirectStandardError "server_err.txt"
+          # Start via cmd and redirect logs inside cmd so we keep diagnostics
+          # without using Start-Process native redirection flags.
+          $proc = Start-Process cmd -ArgumentList "/c python -u -X utf8 dashboard.py --port 8900 --no-debug > server_out.txt 2> server_err.txt" -PassThru
+          Write-Host "Started dashboard process pid=$($proc.Id)"
           $ready = $false
           for ($i = 0; $i -lt 30; $i++) {
             try {
-              $r = Invoke-WebRequest -Uri "http://localhost:8900/api/health" -Headers @{"Authorization"="Bearer ci-test-token"} -UseBasicParsing -ErrorAction Stop
+              # Probe a lightweight endpoint that is always public and fast.
+              $r = Invoke-WebRequest -Uri "http://localhost:8900/api/auth/check" -UseBasicParsing -TimeoutSec 8 -ErrorAction Stop
               if ($r.StatusCode -eq 200) { $ready = $true; break }
             } catch {}
             Start-Sleep 1
           }
           if (-not $ready) {
-            Write-Host "=== server_out.txt ===" 
-            if (Test-Path server_out.txt) { Get-Content server_out.txt }
-            Write-Host "=== server_err.txt ==="
-            if (Test-Path server_err.txt) { Get-Content server_err.txt }
+            Write-Host "Dashboard process status:"
+            Get-Process -Id $proc.Id -ErrorAction SilentlyContinue | Format-List -Property Id,ProcessName,StartTime
+            if (Test-Path server_out.txt) {
+              Write-Host "=== server_out.txt ==="
+              Get-Content server_out.txt -Tail 200
+            }
+            if (Test-Path server_err.txt) {
+              Write-Host "=== server_err.txt ==="
+              Get-Content server_err.txt -Tail 200
+            }
             Write-Error "Server failed to start"; exit 1
           }
         shell: pwsh
 
       - name: Run API tests
         env:
-          CLAWMETRY_URL: http://localhost:8900
-          CLAWMETRY_TOKEN: ci-test-token
+          CLAWTELEMETRY_URL: http://localhost:8900
+          CLAWTELEMETRY_TOKEN: ci-test-token
         run: python3 -m pytest tests/test_api.py -v --tb=short
 
   # ── E2E Playwright tests (Linux only for speed, allowed to fail) ──────────
@@ -115,8 +132,8 @@ jobs:
           done
       - name: Run E2E tests
         env:
-          CLAWMETRY_URL: http://localhost:8900
-          CLAWMETRY_TOKEN: ci-test-token
+          CLAWTELEMETRY_URL: http://localhost:8900
+          CLAWTELEMETRY_TOKEN: ci-test-token
         run: python3 -m pytest tests/test_e2e.py -v --tb=short
 
   # ── pip install smoke test across platforms ───────────────────────────────

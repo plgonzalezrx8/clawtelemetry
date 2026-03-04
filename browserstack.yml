@@ -1,9 +1,9 @@
 userName: ${BROWSERSTACK_USERNAME}
 accessKey: ${BROWSERSTACK_ACCESS_KEY}
 
-buildName: "ClawMetry PR Tests"
+buildName: "ClawTelemetry PR Tests"
 buildIdentifier: "#${BUILD_NUMBER}"
-projectName: "ClawMetry"
+projectName: "ClawTelemetry"
 
 # Local testing - allows BrowserStack to reach localhost:8900
 browserstackLocal: true

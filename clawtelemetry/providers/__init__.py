@@ -1,47 +1,47 @@
-"""Provider registry for ClawMetry data backends."""
+"""Provider registry for ClawTelemetry data backends."""
 from __future__ import annotations
 import logging
 import os
 from typing import Dict, Optional, Type
 
-from clawmetry.providers.base import ClawMetryDataProvider
+from clawtelemetry.providers.base import ClawTelemetryDataProvider
 
-logger = logging.getLogger("clawmetry.providers")
+logger = logging.getLogger("clawtelemetry.providers")
 
-_registry: Dict[str, Type[ClawMetryDataProvider]] = {}
-_active_provider: Optional[ClawMetryDataProvider] = None
+_registry: Dict[str, Type[ClawTelemetryDataProvider]] = {}
+_active_provider: Optional[ClawTelemetryDataProvider] = None
 
 
-def register_provider(name: str, cls: Type[ClawMetryDataProvider]) -> None:
+def register_provider(name: str, cls: Type[ClawTelemetryDataProvider]) -> None:
     _registry[name] = cls
 
 
-def get_provider(name: str, **kwargs) -> ClawMetryDataProvider:
+def get_provider(name: str, **kwargs) -> ClawTelemetryDataProvider:
     if name not in _registry:
         raise ValueError(f"Unknown provider: {name!r}. Available: {list(_registry)}")
     return _registry[name](**kwargs)
 
 
-def get_active_provider() -> Optional[ClawMetryDataProvider]:
+def get_active_provider() -> Optional[ClawTelemetryDataProvider]:
     return _active_provider
 
 
-def set_active_provider(provider: ClawMetryDataProvider) -> None:
+def set_active_provider(provider: ClawTelemetryDataProvider) -> None:
     global _active_provider
     _active_provider = provider
 
 
 def init_providers(sessions_dir: str = "", log_dir: str = "", workspace: str = "",
-                   metrics_file: str = "", fleet_db: str = "") -> ClawMetryDataProvider:
+                   metrics_file: str = "", fleet_db: str = "") -> ClawTelemetryDataProvider:
     """
     Initialize built-in providers and set the active one.
     Called once at dashboard startup after path detection.
     """
-    from clawmetry.providers.local import LocalDataProvider
+    from clawtelemetry.providers.local import LocalDataProvider
     register_provider("local", LocalDataProvider)
 
     try:
-        from clawmetry.providers.turso import TursoDataProvider
+        from clawtelemetry.providers.turso import TursoDataProvider
         register_provider("turso", TursoDataProvider)
     except Exception as e:
         logger.debug("Turso provider not available: %s", e)
@@ -49,7 +49,7 @@ def init_providers(sessions_dir: str = "", log_dir: str = "", workspace: str = "
     # Load 3rd-party providers via entry points
     try:
         import importlib.metadata
-        for ep in importlib.metadata.entry_points(group="clawmetry.providers"):
+        for ep in importlib.metadata.entry_points(group="clawtelemetry.providers"):
             try:
                 cls = ep.load()
                 register_provider(ep.name, cls)
@@ -59,7 +59,7 @@ def init_providers(sessions_dir: str = "", log_dir: str = "", workspace: str = "
     except Exception:
         pass
 
-    provider_name = os.environ.get("CLAWMETRY_PROVIDER", "local")
+    provider_name = os.environ.get("CLAWTELEMETRY_PROVIDER", "local")
     if provider_name not in _registry:
         provider_name = "local"
 

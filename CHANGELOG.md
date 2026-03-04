@@ -38,7 +38,7 @@
 ## [0.10.6] — 2026-02-28
 
 ### Fixed
-- Port conflict: only kill our own stale clawmetry process, not arbitrary apps on the same port
+- Port conflict: only kill our own stale clawtelemetry process, not arbitrary apps on the same port
 - Clear error message if another app is already using the port
 
 ---
@@ -53,7 +53,7 @@
 ## [0.10.4] — 2026-02-28
 
 ### Fixed
-- Hide `clawmetry connect` command from help (cloud integration not yet production ready)
+- Hide `clawtelemetry connect` command from help (cloud integration not yet production ready)
 
 ---
 
@@ -81,7 +81,7 @@
 - Sub-Agents tab removed from nav
 
 
-All notable changes to ClawMetry are documented here.
+All notable changes to ClawTelemetry are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ---
@@ -104,7 +104,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - **Full test suite** — pytest API tests, Playwright E2E, BrowserStack cross-browser tests
 - **CI matrix** — Linux/macOS/Windows on every PR via GitHub Actions
 - **BrowserStack CI** — Chrome, Firefox, Safari, Edge on merge to main
-- **Auto-publish workflow** — `git tag vX.Y.Z && git push --tags` publishes to PyPI
+- **Auto-release workflow** — `git tag vX.Y.Z && git push --tags` publishes GitHub Release assets
 - **Makefile** — `make dev`, `make test-fast`, `make test`, `make lint`
 - `CHANGELOG.md` — this file
 
@@ -144,7 +144,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [0.10.2] — 2026-02-28
 
 ### Added
-- Full CLI with subcommands: `clawmetry start/stop/restart/status/connect/uninstall`
+- Full CLI with subcommands: `clawtelemetry start/stop/restart/status/connect/uninstall`
 - Daemon support: launchd (macOS) + systemd (Linux) — auto-starts on login
-- Architecture overview on startup matching clawmetry.com/how-it-works
-- `clawmetry --help` and `clawmetry help` 
+- Architecture overview on startup matching repository docs
+- `clawtelemetry --help` and `clawtelemetry help` 

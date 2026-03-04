@@ -1,7 +1,7 @@
 # 00 Start Here
 
 ## Current Objective
-Complete a full engineering-core audit and establish durable internal docs for ClawMetry.
+Complete a full engineering-core audit and establish durable internal docs for ClawTelemetry.
 
 ## Current Snapshot (2026-03-04)
 - `DEV-DOCS` scaffold and audit dossier created.
@@ -23,10 +23,10 @@ Complete a full engineering-core audit and establish durable internal docs for C
 ## Quick Commands
 ```bash
 # syntax/import sanity
-python3 -m py_compile dashboard.py history.py clawmetry/*.py clawmetry/providers/*.py
+python3 -m py_compile dashboard.py history.py clawtelemetry/*.py clawtelemetry/providers/*.py
 
 # API suite (isolated)
-CLAWMETRY_URL=http://127.0.0.1:8924 CLAWMETRY_TOKEN=<token> pytest -q tests/test_api.py -q
+CLAWTELEMETRY_URL=http://127.0.0.1:8924 CLAWTELEMETRY_TOKEN=<token> pytest -q tests/test_api.py -q
 
 # run server
 python3 dashboard.py --port 8900 --no-debug

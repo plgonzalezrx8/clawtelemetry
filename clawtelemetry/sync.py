@@ -1,9 +1,9 @@
 """
-clawmetry/sync.py — Cloud sync daemon for clawmetry connect.
+clawtelemetry/sync.py — Cloud sync daemon for clawtelemetry connect.
 
 Reads local OpenClaw sessions/logs, encrypts with AES-256-GCM (E2E),
-and streams to ingest.clawmetry.com. The encryption key never leaves
-the local machine — cloud stores ciphertext only.
+and streams to a configured ingest endpoint. The encryption key never
+leaves the local machine — the remote service stores ciphertext only.
 """
 from __future__ import annotations
 import json
@@ -22,8 +22,8 @@ import urllib.error
 from pathlib import Path
 from datetime import datetime, timezone
 
-INGEST_URL = os.environ.get("CLAWMETRY_INGEST_URL", "https://ingest.clawmetry.com")
-CONFIG_DIR  = Path.home() / ".clawmetry"
+INGEST_URL = os.environ.get("CLAWTELEMETRY_INGEST_URL", "").strip()
+CONFIG_DIR  = Path.home() / ".clawtelemetry"
 CONFIG_FILE = CONFIG_DIR / "config.json"
 STATE_FILE  = CONFIG_DIR / "sync-state.json"
 LOG_FILE    = CONFIG_DIR / "sync.log"
@@ -32,15 +32,18 @@ POLL_INTERVAL = 15    # seconds between sync cycles
 STREAM_INTERVAL = 2   # seconds between real-time stream pushes
 BATCH_SIZE    = 50    # events per encrypted POST
 
+# Ensure logging target directory exists before FileHandler initialization.
+CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [clawmetry-sync] %(levelname)s %(message)s",
+    format="%(asctime)s [clawtelemetry-sync] %(levelname)s %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
         logging.FileHandler(str(LOG_FILE), encoding="utf-8"),
     ],
 )
-log = logging.getLogger("clawmetry.sync")
+log = logging.getLogger("clawtelemetry.sync")
 
 
 # ── Encryption (AES-256-GCM) ─────────────────────────────────────────────────
@@ -88,7 +91,7 @@ def decrypt_payload(blob: str, key_b64: str) -> dict:
 
 def load_config() -> dict:
     if not CONFIG_FILE.exists():
-        raise FileNotFoundError(f"No config at {CONFIG_FILE}. Run: clawmetry connect")
+        raise FileNotFoundError(f"No config at {CONFIG_FILE}. Run: clawtelemetry connect")
     return json.loads(CONFIG_FILE.read_text())
 
 
@@ -115,6 +118,11 @@ def save_state(state: dict) -> None:
 # ── HTTP ──────────────────────────────────────────────────────────────────────
 
 def _post(path: str, payload: dict, api_key: str, timeout: int = 15) -> dict:
+    if not INGEST_URL:
+        raise RuntimeError(
+            "CLAWTELEMETRY_INGEST_URL is not configured. "
+            "Set it to your ingest API base URL before running cloud sync."
+        )
     url  = INGEST_URL.rstrip("/") + path
     body = json.dumps(payload).encode()
     headers = {"Content-Type": "application/json", "X-Api-Key": api_key}

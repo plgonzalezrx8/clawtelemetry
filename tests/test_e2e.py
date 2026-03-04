@@ -1,5 +1,5 @@
 """
-ClawMetry E2E browser tests using Playwright.
+ClawTelemetry E2E browser tests using Playwright.
 
 Tests key UI screens to ensure they load and render correctly.
 Uses actual click interactions (nav tabs use event.target so JS calls won't work).
@@ -10,11 +10,11 @@ import pytest
 from playwright.sync_api import Page, sync_playwright
 
 
-BASE_URL = os.environ.get("CLAWMETRY_URL", "http://localhost:8900")
+BASE_URL = os.environ.get("CLAWTELEMETRY_URL", "http://localhost:8900")
 
 
 def _detect_gateway_token():
-    token = os.environ.get("CLAWMETRY_TOKEN", "").strip()
+    token = os.environ.get("CLAWTELEMETRY_TOKEN", "").strip()
     if token:
         return token
     config_path = os.path.expanduser("~/.openclaw/openclaw.json")
@@ -45,7 +45,7 @@ def browser_context():
             setup_page = ctx.new_page()
             setup_page.goto(BASE_URL, wait_until="domcontentloaded")
             setup_page.evaluate(
-                f"localStorage.setItem('clawmetry-token', '{GATEWAY_TOKEN}')"
+                f"localStorage.setItem('clawtelemetry-token', '{GATEWAY_TOKEN}')"
             )
             setup_page.close()
 
@@ -66,7 +66,7 @@ def load_dashboard(page: Page, wait_ms: int = 1500):
     # Inject token before navigating (each new page needs it)
     if GATEWAY_TOKEN:
         page.goto(BASE_URL, wait_until="domcontentloaded")
-        page.evaluate(f"localStorage.setItem('clawmetry-token', '{GATEWAY_TOKEN}')")
+        page.evaluate(f"localStorage.setItem('clawtelemetry-token', '{GATEWAY_TOKEN}')")
         page.reload(wait_until="domcontentloaded")
     else:
         page.goto(BASE_URL, wait_until="domcontentloaded")

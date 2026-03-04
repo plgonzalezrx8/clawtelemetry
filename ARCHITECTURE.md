@@ -1,6 +1,6 @@
-# ClawMetry Architecture — How It Works
+# ClawTelemetry Architecture — How It Works
 
-> A human-friendly guide to how ClawMetry sees everything your AI agents do.
+> A human-friendly guide to how ClawTelemetry sees everything your AI agents do.
 
 ## The Big Picture
 
@@ -10,7 +10,7 @@
 │                                                          │
 │  ┌──────────────┐     reads      ┌──────────────────┐   │
 │  │              │ ──────────────► │                  │   │
-│  │   OpenClaw   │   filesystem   │    ClawMetry     │   │
+│  │   OpenClaw   │   filesystem   │    ClawTelemetry     │   │
 │  │   Gateway    │ ◄──────────────│    Dashboard     │   │
 │  │              │   WebSocket    │   (Flask app)    │   │
 │  │  port 18789  │    JSON-RPC    │   port 8900      │   │
@@ -26,15 +26,15 @@
 └─────────────────────────────────────────────────────────┘
 ```
 
-ClawMetry is a **read-only observer** that sits alongside your OpenClaw gateway. It never modifies your agents or their data. It reads what OpenClaw already writes to disk and connects to the gateway's WebSocket API for real-time updates.
+ClawTelemetry is a **read-only observer** that sits alongside your OpenClaw gateway. It never modifies your agents or their data. It reads what OpenClaw already writes to disk and connects to the gateway's WebSocket API for real-time updates.
 
-## How ClawMetry Gets Its Data
+## How ClawTelemetry Gets Its Data
 
-ClawMetry has **three data sources**, all local to your machine:
+ClawTelemetry has **three data sources**, all local to your machine:
 
 ### 1. Filesystem Reading (Primary)
 
-OpenClaw stores everything as files. ClawMetry reads them directly:
+OpenClaw stores everything as files. ClawTelemetry reads them directly:
 
 | What | Where | Format |
 |------|-------|--------|
@@ -44,30 +44,30 @@ OpenClaw stores everything as files. ClawMetry reads them directly:
 | Memory files | `{workspace}/memory/*.md` | Markdown — agent's daily notes |
 | Cron state | Internal gateway state | Via WebSocket RPC |
 
-**Session transcripts** are the richest data source. Each `.jsonl` file contains every message, tool call, tool result, thinking block, and token count for a session. ClawMetry parses these to build timelines, calculate costs, and show what each agent decided.
+**Session transcripts** are the richest data source. Each `.jsonl` file contains every message, tool call, tool result, thinking block, and token count for a session. ClawTelemetry parses these to build timelines, calculate costs, and show what each agent decided.
 
 ### 2. Gateway WebSocket (Real-time)
 
-ClawMetry connects to the OpenClaw gateway via WebSocket (`ws://localhost:18789`) using JSON-RPC:
+ClawTelemetry connects to the OpenClaw gateway via WebSocket (`ws://localhost:18789`) using JSON-RPC:
 
 - **Session list** — which sessions are active right now
 - **Cron jobs** — scheduled tasks, their status, run history
 - **Gateway config** — model settings, channel config
-- **Tool invocations** — ClawMetry can invoke gateway tools (e.g., restart crons)
+- **Tool invocations** — ClawTelemetry can invoke gateway tools (e.g., restart crons)
 
 This is how the dashboard updates in real-time without polling.
 
 ### 3. OpenTelemetry Receiver (Optional)
 
-ClawMetry can receive OTLP metrics and traces on:
+ClawTelemetry can receive OTLP metrics and traces on:
 - `POST /v1/metrics` — Prometheus-style metrics in protobuf
 - `POST /v1/traces` — Distributed traces in protobuf
 
-This allows external tools or custom instrumentation to feed data into ClawMetry.
+This allows external tools or custom instrumentation to feed data into ClawTelemetry.
 
 ## Auto-Detection — Zero Config
 
-When you run `clawmetry`, it automatically finds everything:
+When you run `clawtelemetry`, it automatically finds everything:
 
 1. **Workspace** — Checks `OPENCLAW_HOME`, then `~/.openclaw`, then common paths
 2. **Gateway port** — Reads `openclaw.json` for the bind port (default 18789)
@@ -75,11 +75,11 @@ When you run `clawmetry`, it automatically finds everything:
 4. **Log directory** — Checks `/tmp/moltbot/` for gateway logs
 5. **Sessions directory** — Finds `~/.openclaw/agents/main/sessions/`
 
-No environment variables, no config files, no database setup. If OpenClaw is running, ClawMetry finds it.
+No environment variables, no config files, no database setup. If OpenClaw is running, ClawTelemetry finds it.
 
 ## The Dashboard — What You See
 
-ClawMetry serves a single-page web app (embedded HTML/CSS/JS in the Python file) with these views:
+ClawTelemetry serves a single-page web app (embedded HTML/CSS/JS in the Python file) with these views:
 
 ### Overview (`/api/overview`)
 The main dashboard. Aggregates:
@@ -140,7 +140,7 @@ Infrastructure monitoring:
 
 ## Budget & Alerts System
 
-ClawMetry includes a built-in budget monitor:
+ClawTelemetry includes a built-in budget monitor:
 
 ```
 Budget Config → Monitor Loop (every 60s) → Check Spend
@@ -169,7 +169,7 @@ For users running multiple OpenClaw instances:
      └───────────────┼───────────────┘
                      ▼
             ┌────────────────┐
-            │   ClawMetry    │
+            │   ClawTelemetry    │
             │  Fleet View    │
             │  (central)     │
             └────────────────┘
@@ -177,13 +177,13 @@ For users running multiple OpenClaw instances:
 
 Nodes register via `POST /api/nodes/register` and send periodic metrics. The fleet view shows all nodes, their health, sessions, and aggregated costs.
 
-Secured with `CLAWMETRY_FLEET_KEY` — nodes must provide the API key to register.
+Secured with `CLAWTELEMETRY_FLEET_KEY` — nodes must provide the API key to register.
 
 ## Technical Details
 
 ### Single-File Architecture
-ClawMetry is intentionally a **single Python file** (`dashboard.py`, ~11,600 lines). This makes it:
-- Easy to install (`pip install clawmetry`)
+ClawTelemetry is intentionally a **single Python file** (`dashboard.py`, ~11,600 lines). This makes it:
+- Easy to install from GitHub release scripts
 - Easy to audit (one file to read)
 - Easy to deploy (no build step)
 - Portable (runs on a Raspberry Pi)
@@ -218,18 +218,18 @@ An optional companion that adds persistent time-series:
 
 ## Data Flow Example
 
-Here's what happens when you open ClawMetry and look at a running sub-agent:
+Here's what happens when you open ClawTelemetry and look at a running sub-agent:
 
 1. **Browser** requests `/api/subagents`
-2. **ClawMetry** reads `~/.openclaw/agents/main/sessions/sessions.json` (session index)
-3. **ClawMetry** identifies sub-agent sessions, reads each `.jsonl` transcript
+2. **ClawTelemetry** reads `~/.openclaw/agents/main/sessions/sessions.json` (session index)
+3. **ClawTelemetry** identifies sub-agent sessions, reads each `.jsonl` transcript
 4. For each session, it parses events to extract:
    - Task description (from the spawn message)
    - Current status (running if no completion event)
    - Token counts (summed from all assistant turns)
    - Tools used (from tool_use events)
    - Runtime (first event timestamp to last)
-5. **ClawMetry** also queries the gateway via WebSocket for live session state
+5. **ClawTelemetry** also queries the gateway via WebSocket for live session state
 6. **Response** sent to browser as JSON
 7. **Browser** renders the sub-agent cards with live-updating metrics
 
@@ -237,4 +237,4 @@ All of this happens in <100ms for typical setups.
 
 ---
 
-*ClawMetry is open source under MIT License. See [github.com/vivekchand/clawmetry](https://github.com/vivekchand/clawmetry)*
+*ClawTelemetry is open source under MIT License. See [github.com/plgonzalezrx8/clawtelemetry](https://github.com/plgonzalezrx8/clawtelemetry)*

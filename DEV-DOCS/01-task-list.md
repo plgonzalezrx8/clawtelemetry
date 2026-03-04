@@ -9,8 +9,12 @@
 - [x] TSK-102 Generate evidence exports in `DEV-DOCS/reports`
 - [x] TSK-103 Define standards for coding, commenting, testing, and security docs
 - [x] TSK-001 Resolve duplicated runtime/function blocks in `dashboard.py` without splitting file
-- [x] TSK-002 Make test startup deterministic independent of existing `~/.clawmetry-gateway.json`
+- [x] TSK-002 Make test startup deterministic independent of existing `~/.clawtelemetry-gateway.json`
 - [x] TSK-104 Add duplicate definition guard to CI and local lint workflow
+- [x] TSK-300 Rebrand runtime/package/install/docs from `clawmetry` to `clawtelemetry`
+- [x] TSK-301 Replace PyPI publish flow with GitHub Release assets workflow
+- [x] TSK-302 Rewrite install scripts for GitHub archive/tag installation
+- [x] TSK-303 Add CI guard to block legacy brand token reintroduction
 
 ## Backlog
 - [ ] TSK-200 Add automated comment-density check integrated with CI (non-blocking first)

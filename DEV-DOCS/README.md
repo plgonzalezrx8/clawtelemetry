@@ -1,4 +1,4 @@
-# ClawMetry Developer Docs (`DEV-DOCS`)
+# ClawTelemetry Developer Docs (`DEV-DOCS`)
 
 ## Purpose
 This directory is the internal engineering source of truth for:

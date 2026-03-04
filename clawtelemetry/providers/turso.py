@@ -1,26 +1,26 @@
-"""Turso cloud data provider for ClawMetry cloud dashboard."""
+"""Turso cloud data provider for ClawTelemetry cloud dashboard."""
 from __future__ import annotations
 import hashlib, json, logging, os, urllib.request, urllib.error
 from typing import Any, Dict, List, Optional
-from clawmetry.providers.base import (
-    ClawMetryDataProvider, Event, LogEntry, MemoryFile, MetricPoint, Session
+from clawtelemetry.providers.base import (
+    ClawTelemetryDataProvider, Event, LogEntry, MemoryFile, MetricPoint, Session
 )
-logger = logging.getLogger("clawmetry.providers.turso")
+logger = logging.getLogger("clawtelemetry.providers.turso")
 
-class TursoDataProvider(ClawMetryDataProvider):
+class TursoDataProvider(ClawTelemetryDataProvider):
     """
-    Reads data from Turso (libSQL) for the ClawMetry cloud dashboard.
-    Set CLAWMETRY_PROVIDER=turso with TURSO_URL + TURSO_TOKEN + CLAWMETRY_TOKEN.
+    Reads data from Turso (libSQL) for the ClawTelemetry cloud dashboard.
+    Set CLAWTELEMETRY_PROVIDER=turso with TURSO_URL + TURSO_TOKEN + CLAWTELEMETRY_TOKEN.
     owner_hash is derived from the cm_ API token automatically.
     """
     def __init__(self, turso_url="", turso_token="", owner_hash="", node_id="", **kwargs):
         super().__init__(**kwargs)
         self.turso_url = turso_url or os.environ.get("TURSO_URL", "")
         self.turso_token = turso_token or os.environ.get("TURSO_TOKEN", "")
-        cm_token = os.environ.get("CLAWMETRY_TOKEN", "")
+        cm_token = os.environ.get("CLAWTELEMETRY_TOKEN", "")
         self.owner_hash = owner_hash or (
             hashlib.sha256(cm_token.encode()).hexdigest() if cm_token else "")
-        self.node_id = node_id or os.environ.get("CLAWMETRY_NODE_ID", "")
+        self.node_id = node_id or os.environ.get("CLAWTELEMETRY_NODE_ID", "")
 
     def _query(self, sql, params=None):
         if not self.turso_url or not self.turso_token:

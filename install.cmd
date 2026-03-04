@@ -1,43 +1,31 @@
 @echo off
-REM ClawMetry Installer for Windows (CMD)
-REM Usage: curl -fsSL https://clawmetry.com/install.cmd -o install.cmd && install.cmd && del install.cmd
+REM ClawTelemetry installer for Windows (CMD)
+REM Uses the PowerShell installer to keep one canonical implementation.
+REM PATH verification happens in CI after install using LOCALAPPDATA\\clawtelemetry\\Scripts.
+REM Usage: curl -fsSL https://raw.githubusercontent.com/plgonzalezrx8/clawtelemetry/main/install.cmd -o install.cmd && install.cmd && del install.cmd
 
 echo.
-echo   🦞 ClawMetry Installer
-echo   Real-time observability for OpenClaw agents
-echo.
+echo   ClawTelemetry Installer
 
-REM Check for Python
-where python >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    where python3 >nul 2>&1
-    if %ERRORLEVEL% NEQ 0 (
-        echo   ✗ Python not found.
-        echo   Install Python from https://python.org/downloads
-        echo.
-        exit /b 1
-    )
-    set PYTHON=python3
+echo   Delegating install to PowerShell script...
+if exist "%~dp0install.ps1" (
+  powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0install.ps1"
 ) else (
-    set PYTHON=python
+  powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/plgonzalezrx8/clawtelemetry/main/install.ps1 | iex"
 )
 
-REM Check Python version
-%PYTHON% -c "import sys; exit(0 if sys.version_info >= (3, 10) else 1)" 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo   ✗ Python 3.10+ required.
-    echo   Install from https://python.org/downloads
-    exit /b 1
+  echo.
+  echo   Installation failed.
+  exit /b 1
 )
 
-echo   → Installing clawmetry...
-%PYTHON% -m pip install --upgrade clawmetry >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    %PYTHON% -m pip install --user --upgrade clawmetry >nul 2>&1
+REM PowerShell child processes do not propagate PATH updates back to CMD.
+REM Prepend the expected Scripts directory so clawtelemetry resolves now.
+set "CLAWTELEMETRY_SCRIPTS=%LOCALAPPDATA%\clawtelemetry\Scripts"
+if exist "%CLAWTELEMETRY_SCRIPTS%\clawtelemetry.exe" (
+  set "PATH=%CLAWTELEMETRY_SCRIPTS%;%PATH%"
 )
 
-echo   ✓ Installed clawmetry
 echo.
-echo   Ready! Run 'clawmetry' to start the dashboard.
-echo   Then open http://localhost:8900 in your browser.
-echo.
+echo   Installation complete. Run: clawtelemetry --version

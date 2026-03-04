@@ -9,10 +9,10 @@
 ## Deterministic Local Runbook
 ```bash
 # syntax/import
-python3 -m py_compile dashboard.py history.py clawmetry/*.py clawmetry/providers/*.py
+python3 -m py_compile dashboard.py history.py clawtelemetry/*.py clawtelemetry/providers/*.py
 
 # API tests (isolated URL + known token)
-CLAWMETRY_URL=http://127.0.0.1:8924 CLAWMETRY_TOKEN=<token> pytest -q tests/test_api.py -q
+CLAWTELEMETRY_URL=http://127.0.0.1:8924 CLAWTELEMETRY_TOKEN=<token> pytest -q tests/test_api.py -q
 ```
 
 ## Known Testing Gotcha

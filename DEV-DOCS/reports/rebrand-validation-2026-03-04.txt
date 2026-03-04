@@ -1,0 +1,36 @@
+# Rebrand validation - 2026-03-04
+
+## Legacy token scan (active files)
+$ rg -n "Clawmetry|clawmetry|CLAWMETRY" . --glob '!.git/*' --glob '!LICENSE' --glob '!CHANGELOG.md' --glob '!DEV-DOCS/**'
+(no matches)
+
+## Compile checks
+$ python3 -m compileall dashboard.py history.py clawtelemetry tests
+Listing 'clawtelemetry'...
+Listing 'clawtelemetry/blueprints'...
+Listing 'clawtelemetry/providers'...
+Listing 'tests'...
+
+## Import smoke
+$ python3 -c "import clawtelemetry, dashboard; print('clawtelemetry', clawtelemetry.__version__)"
+clawtelemetry 0.11.28
+
+## Runtime health smoke
+$ OPENCLAW_GATEWAY_TOKEN=dev-token python3 dashboard.py --port 8911 --no-debug ... /api/health
+health_status=200
+{"checks":[{"color":"green","detail":"Port 18789 responding","id":"gateway","status":"healthy"},{"color":"green","detail":"28.4 GB free (88% used)","id":"disk","status":"healthy"},{"color":"yellow","detail":"Check failed","id":"memory","status":"warning"},{"color":"green","detail":"","id":"uptime","status":"healthy"},{"color":"yellow","detail":"OTLP ready - no data received yet","id":"otel","status":"warning"}]}
+
+## API tests (isolated)
+$ CLAWTELEMETRY_URL=http://127.0.0.1:8933 CLAWTELEMETRY_TOKEN=dev-token python3 -m pytest tests/test_api.py -q
+.............................................sssss                       [100%]
+=============================== warnings summary ===============================
+../../../../Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/__init__.py:113
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (6.0.0.post1)/charset_normalizer (3.4.4) doesn't match a supported version!
+    warnings.warn(
+
+tests/test_api.py::TestAuth::test_auth_check_accessible
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/pytest_asyncio/plugin.py:1190: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    return asyncio.get_event_loop_policy()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+45 passed, 5 skipped, 2 warnings in 3.36s

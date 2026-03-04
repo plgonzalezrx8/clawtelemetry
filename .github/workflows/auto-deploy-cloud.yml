@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'dashboard.py'
-      - 'clawmetry/**'
+      - 'clawtelemetry/**'
       - 'setup.py'
   workflow_dispatch:
 
@@ -27,25 +27,25 @@ jobs:
       - name: Checkout cloud repo
         uses: actions/checkout@v4
         with:
-          repository: vivekchand/clawmetry-cloud
+          repository: vivekchand/clawtelemetry-cloud
           token: ${{ secrets.CLOUD_REPO_PAT }}
-          path: clawmetry-cloud
+          path: clawtelemetry-cloud
 
-      - name: Pin clawmetry version in cloud Dockerfile
+      - name: Pin clawtelemetry version in cloud Dockerfile
         run: |
-          cd clawmetry-cloud
-          sed -i "s/clawmetry==[0-9.]*/clawmetry==${{ steps.oss_version.outputs.version }}/" Dockerfile
-          grep -q "clawmetry==${{ steps.oss_version.outputs.version }}" Dockerfile || \
-            sed -i "s/clawmetry$/clawmetry==${{ steps.oss_version.outputs.version }}/" Dockerfile
-          echo "Dockerfile:"; grep clawmetry Dockerfile
+          cd clawtelemetry-cloud
+          sed -i "s/clawtelemetry==[0-9.]*/clawtelemetry==${{ steps.oss_version.outputs.version }}/" Dockerfile
+          grep -q "clawtelemetry==${{ steps.oss_version.outputs.version }}" Dockerfile || \
+            sed -i "s/clawtelemetry$/clawtelemetry==${{ steps.oss_version.outputs.version }}/" Dockerfile
+          echo "Dockerfile:"; grep clawtelemetry Dockerfile
 
       - name: Commit and push version pin
         run: |
-          cd clawmetry-cloud
-          git config user.email "diya-bot@clawmetry.com"
+          cd clawtelemetry-cloud
+          git config user.email "automation@users.noreply.github.com"
           git config user.name "Diya (auto-deploy)"
           git add Dockerfile
           git diff --staged --quiet && echo "No change needed" || \
-            git commit -m "chore: auto-pin clawmetry==${{ steps.oss_version.outputs.version }} from OSS"
+            git commit -m "chore: auto-pin clawtelemetry==${{ steps.oss_version.outputs.version }} from OSS"
           git push
-          echo "✅ Cloud repo pinned to clawmetry==${{ steps.oss_version.outputs.version }} — Dhriti cron will deploy"
+          echo "✅ Cloud repo pinned to clawtelemetry==${{ steps.oss_version.outputs.version }} — Dhriti cron will deploy"

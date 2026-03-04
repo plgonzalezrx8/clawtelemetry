@@ -36,7 +36,7 @@ Data flow works end-to-end, but state orchestration relies heavily on mutable gl
 - Likelihood: Medium
 - Affected files:
   - `dashboard.py`
-  - `clawmetry/providers/*.py`
+  - `clawtelemetry/providers/*.py`
 - Evidence:
   - provider registry and implementations exist, while many routes still read directly via helper logic
 - Recommended fix:

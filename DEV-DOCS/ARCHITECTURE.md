@@ -1,22 +1,22 @@
 # Internal Architecture
 
 ## System Shape
-ClawMetry is a Python Flask dashboard with embedded frontend templates and runtime data collection.
+ClawTelemetry is a Python Flask dashboard with embedded frontend templates and runtime data collection.
 
 Primary runtime assets:
 - `dashboard.py`: server, API routes, embedded HTML/CSS/JS, CLI entrypoint
 - `history.py`: optional local history/time-series collector
-- `clawmetry/`: package helpers (CLI, sync daemon, providers, extensions)
+- `clawtelemetry/`: package helpers (CLI, sync daemon, providers, extensions)
 
 ## Entry Points
 - `python3 dashboard.py`
-- `clawmetry` console script -> `clawmetry.cli:main`
+- `clawtelemetry` console script -> `clawtelemetry.cli:main`
 
 ## Runtime Responsibilities
 - auto-detect workspace, sessions, logs, gateway connection
 - expose API surface for dashboard UI and integrations
 - optionally receive OTLP metrics/traces (`/v1/metrics`, `/v1/traces`)
-- optionally sync encrypted data to cloud via `clawmetry/sync.py`
+- optionally sync encrypted data to cloud via `clawtelemetry/sync.py`
 
 ## API Surface Summary
 From runtime route inventory (`DEV-DOCS/reports/route-inventory-2026-03-04.txt`):

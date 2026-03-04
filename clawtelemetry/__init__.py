@@ -1,4 +1,4 @@
-"""ClawMetry — OpenClaw Observability Dashboard."""
+"""ClawTelemetry — OpenClaw Observability Dashboard."""
 import re as _re
 import os as _os
 

@@ -1,4 +1,4 @@
-"""CLI entry point for the clawmetry package."""
+"""CLI entry point for the clawtelemetry package."""
 from __future__ import annotations
 import sys
 import os
@@ -9,21 +9,27 @@ if _root not in sys.path:
 
 
 def _cmd_connect(args) -> None:
-    """clawmetry connect — validate key, save config, start daemon."""
+    """clawtelemetry connect — validate key, save config, start daemon."""
     import getpass
-    from clawmetry.sync import validate_key, save_config, CONFIG_FILE, CONFIG_DIR
+    from clawtelemetry.sync import validate_key, save_config, INGEST_URL
     import platform, socket
 
-    api_key = args.key or os.environ.get("CLAWMETRY_API_KEY") or ""
+    api_key = args.key or os.environ.get("CLAWTELEMETRY_API_KEY") or ""
     if not api_key:
-        print("Get your API key at: https://clawmetry.com/connect\n")
-        api_key = getpass.getpass("ClawMetry API key (cm_…): ").strip()
+        print("Cloud sync requires a configured ingest endpoint and API key.")
+        print("Set CLAWTELEMETRY_INGEST_URL to your backend URL, then provide the API key.\n")
+        api_key = getpass.getpass("ClawTelemetry API key: ").strip()
 
-    if not api_key.startswith("cm_"):
-        print("❌  Key must start with cm_")
+    if not api_key:
+        print("❌  API key is required.")
         sys.exit(1)
 
-    print("Connecting to ClawMetry Cloud… ", end="", flush=True)
+    if not INGEST_URL:
+        print("❌  CLAWTELEMETRY_INGEST_URL is not configured.")
+        print("    Example: export CLAWTELEMETRY_INGEST_URL=https://your-ingest.example")
+        sys.exit(1)
+
+    print("Connecting to configured ClawTelemetry ingest endpoint… ", end="", flush=True)
     try:
         result = validate_key(api_key)
         node_id = result.get("node_id") or socket.gethostname()
@@ -38,7 +44,7 @@ def _cmd_connect(args) -> None:
             print(f"❌  {e}")
             sys.exit(1)
 
-    from clawmetry.sync import generate_encryption_key
+    from clawtelemetry.sync import generate_encryption_key
     enc_key = generate_encryption_key()
 
     config = {
@@ -60,20 +66,20 @@ def _cmd_connect(args) -> None:
     # Start daemon
     _start_daemon(config, args)
     print()
-    print("  All done! Open app.clawmetry.com to see your dashboard.")
+    print("  All done! Cloud sync is configured for this machine.")
     print()
 
 
 def _start_daemon(config: dict, args) -> None:
     """Start the sync daemon (as background process or system service)."""
     import subprocess, sys
-    from clawmetry.sync import CONFIG_DIR, LOG_FILE
+    from clawtelemetry.sync import CONFIG_DIR, LOG_FILE
 
     system = __import__("platform").system()
 
     if getattr(args, "foreground", False):
         print("Running in foreground (Ctrl+C to stop)…")
-        from clawmetry.sync import run_daemon
+        from clawtelemetry.sync import run_daemon
         run_daemon()
         return
 
@@ -87,8 +93,8 @@ def _start_daemon(config: dict, args) -> None:
 
 
 def _register_launchd(config: dict) -> None:
-    from clawmetry.sync import CONFIG_DIR, LOG_FILE
-    label = "com.clawmetry.sync"
+    from clawtelemetry.sync import CONFIG_DIR, LOG_FILE
+    label = "com.clawtelemetry.sync"
     plist_path = __import__("pathlib").Path.home() / "Library" / "LaunchAgents" / f"{label}.plist"
     python = sys.executable
     sync_script = str(__import__("pathlib").Path(__file__).parent / "sync.py")
@@ -122,13 +128,13 @@ def _register_launchd(config: dict) -> None:
         _sp.run(["launchctl", "load", "-w", str(plist_path)],
                 capture_output=True, check=False)
     print("  Running in the background. Your data is syncing to the cloud.")
-    print('  To stop: clawmetry disconnect')
+    print('  To stop: clawtelemetry disconnect')
 
 
 def _register_systemd(config: dict) -> None:
-    from clawmetry.sync import LOG_FILE
+    from clawtelemetry.sync import LOG_FILE
     import subprocess
-    label = "clawmetry-sync"
+    label = "clawtelemetry-sync"
     service_dir = __import__("pathlib").Path.home() / ".config" / "systemd" / "user"
     service_dir.mkdir(parents=True, exist_ok=True)
     service_path = service_dir / f"{label}.service"
@@ -136,7 +142,7 @@ def _register_systemd(config: dict) -> None:
     sync_script = str(__import__("pathlib").Path(__file__).parent / "sync.py")
 
     unit = f"""[Unit]
-Description=ClawMetry Cloud Sync Daemon
+Description=ClawTelemetry Cloud Sync Daemon
 After=network.target
 
 [Service]
@@ -153,7 +159,7 @@ WantedBy=default.target
     subprocess.run(["systemctl", "--user", "daemon-reload"], check=False)
     subprocess.run(["systemctl", "--user", "enable", "--now", label], check=False)
     print("  Running in the background. Your data is syncing to the cloud.")
-    print('  To stop: clawmetry disconnect')
+    print('  To stop: clawtelemetry disconnect')
 
 
 def _start_subprocess() -> None:
@@ -161,7 +167,7 @@ def _start_subprocess() -> None:
     sync_script = str(__import__("pathlib").Path(__file__).parent / "sync.py")
     proc = subprocess.Popen(
         [sys.executable, sync_script],
-        stdout=open(str(__import__("pathlib").Path.home() / ".clawmetry" / "sync.log"), "a"),
+        stdout=open(str(__import__("pathlib").Path.home() / ".clawtelemetry" / "sync.log"), "a"),
         stderr=subprocess.STDOUT,
         start_new_session=True,
     )
@@ -169,25 +175,25 @@ def _start_subprocess() -> None:
 
 
 def _cmd_disconnect(args) -> None:
-    """clawmetry disconnect — stop daemon and remove key."""
+    """clawtelemetry disconnect — stop daemon and remove key."""
     import subprocess
-    from clawmetry.sync import CONFIG_FILE, STATE_FILE
+    from clawtelemetry.sync import CONFIG_FILE, STATE_FILE
     import platform
 
     system = platform.system()
     if system == "Darwin":
-        label = "com.clawmetry.sync"
+        label = "com.clawtelemetry.sync"
         plist = __import__("pathlib").Path.home() / "Library" / "LaunchAgents" / f"{label}.plist"
         subprocess.run(["launchctl", "unload", str(plist)], check=False, capture_output=True)
         if plist.exists():
             plist.unlink()
         print(f"✅  Stopped launchd daemon ({label})")
     elif system == "Linux":
-        subprocess.run(["systemctl", "--user", "disable", "--now", "clawmetry-sync"], check=False, capture_output=True)
-        svc = __import__("pathlib").Path.home() / ".config" / "systemd" / "user" / "clawmetry-sync.service"
+        subprocess.run(["systemctl", "--user", "disable", "--now", "clawtelemetry-sync"], check=False, capture_output=True)
+        svc = __import__("pathlib").Path.home() / ".config" / "systemd" / "user" / "clawtelemetry-sync.service"
         if svc.exists():
             svc.unlink()
-        print("✅  Stopped systemd daemon (clawmetry-sync)")
+        print("✅  Stopped systemd daemon (clawtelemetry-sync)")
 
     if CONFIG_FILE.exists():
         CONFIG_FILE.unlink()
@@ -195,15 +201,15 @@ def _cmd_disconnect(args) -> None:
     if STATE_FILE.exists():
         STATE_FILE.unlink()
 
-    print("Disconnected from ClawMetry Cloud.")
+    print("Disconnected from ClawTelemetry Cloud.")
 
 
 def _cmd_status(args) -> None:
-    """clawmetry status — show local + cloud sync status."""
+    """clawtelemetry status — show local + cloud sync status."""
     import platform
-    from clawmetry.sync import CONFIG_FILE, STATE_FILE, LOG_FILE
+    from clawtelemetry.sync import CONFIG_FILE, STATE_FILE, LOG_FILE
 
-    print("ClawMetry Status\n" + "─" * 40)
+    print("ClawTelemetry Status\n" + "─" * 40)
 
     # Config
     if CONFIG_FILE.exists():
@@ -229,7 +235,7 @@ def _cmd_status(args) -> None:
         except Exception as e:
             print(f"  Config error: {e}")
     else:
-        print("  Cloud sync:  ○  Not connected  (run: clawmetry connect)")
+        print("  Cloud sync:  ○  Not connected  (run: clawtelemetry connect)")
 
     # Sync state
     if STATE_FILE.exists():
@@ -246,14 +252,14 @@ def _cmd_status(args) -> None:
     print()
     if system == "Darwin":
         import subprocess
-        r = subprocess.run(["launchctl", "list", "com.clawmetry.sync"], capture_output=True, text=True)
+        r = subprocess.run(["launchctl", "list", "com.clawtelemetry.sync"], capture_output=True, text=True)
         if r.returncode == 0:
             print("  Daemon:      ✅  Running (launchd)")
         else:
             print("  Daemon:      ○  Not running")
     elif system == "Linux":
         import subprocess
-        r = subprocess.run(["systemctl", "--user", "is-active", "clawmetry-sync"], capture_output=True, text=True)
+        r = subprocess.run(["systemctl", "--user", "is-active", "clawtelemetry-sync"], capture_output=True, text=True)
         running = r.stdout.strip() == "active"
         print(f"  Daemon:      {'✅  Running (systemd)' if running else '○  Not running'}")
 
@@ -269,7 +275,7 @@ def main() -> None:
     import argparse
     from dashboard import main as dashboard_main
 
-    parser = argparse.ArgumentParser(prog="clawmetry", add_help=False)
+    parser = argparse.ArgumentParser(prog="clawtelemetry", add_help=False)
     sub = parser.add_subparsers(dest="cmd")
 
     # connect

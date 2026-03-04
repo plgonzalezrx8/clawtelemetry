@@ -1,10 +1,10 @@
 # Project Structure (Engineering View)
 
 ```text
-clawmetry/
+clawtelemetry/
 ├── dashboard.py                  # Main runtime (Flask app + embedded frontend + CLI logic)
 ├── history.py                    # Optional local history collector (SQLite)
-├── clawmetry/
+├── clawtelemetry/
 │   ├── __init__.py               # package version + main delegation
 │   ├── cli.py                    # console command handlers (start/stop/status/connect)
 │   ├── sync.py                   # cloud sync daemon and encryption pipeline
@@ -24,13 +24,12 @@ clawmetry/
 ├── docs/
 │   └── CLOUD_TESTING.md          # deployment/testing guide
 ├── setup.py                      # main package build config
-├── packages/clawmetry/setup.py   # alias package wrapper
 └── DEV-DOCS/                     # internal engineering docs and audit dossier
 ```
 
 ## Ownership Boundaries
 - runtime behavior: `dashboard.py`
 - optional history persistence: `history.py`
-- cloud and provider extensions: `clawmetry/`
+- cloud and provider extensions: `clawtelemetry/`
 - verification and regressions: `tests/` + `.github/workflows/`
 - internal engineering knowledge: `DEV-DOCS/`

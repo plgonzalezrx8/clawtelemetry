@@ -28,7 +28,7 @@ Test and CI coverage breadth is good, but local determinism and token assumption
   - `tests/test_e2e_browserstack.py`
   - `dashboard.py` (localStorage key usage)
 - Evidence:
-  - app uses `clawmetry-token`; BrowserStack test sets `clawmetry_token`
+  - app uses `clawtelemetry-token`; BrowserStack test sets `clawtelemetry_token`
 - Recommended fix:
   - normalize key names in tests to match runtime frontend
 

@@ -1,133 +1,87 @@
-#!/bin/bash
-# Clawmetry — One-line installer (macOS + Linux)
-# Usage: curl -fsSL https://raw.githubusercontent.com/vivekchand/clawmetry/main/install.sh | bash
-set -e
+#!/usr/bin/env bash
+# ClawTelemetry installer (macOS + Linux)
+# GitHub-only distribution: installs from a GitHub tag/ref archive.
+# Usage: curl -fsSL https://raw.githubusercontent.com/plgonzalezrx8/clawtelemetry/main/install.sh | bash
+set -euo pipefail
 
-echo "🔭 Installing Clawmetry — OpenClaw Observability Dashboard"
+REPO="${CLAWTELEMETRY_REPO:-plgonzalezrx8/clawtelemetry}"
+VERSION="${CLAWTELEMETRY_VERSION:-}"
+REF="${CLAWTELEMETRY_REF:-}"
+INSTALL_DIR="${CLAWTELEMETRY_INSTALL_DIR:-$HOME/.clawtelemetry}"
+BIN_DIR="${CLAWTELEMETRY_BIN_DIR:-$HOME/.local/bin}"
+
+echo "🔭 Installing ClawTelemetry from GitHub"
 echo ""
 
-OS="$(uname -s)"
-INSTALL_DIR=""
-USE_SUDO=""
-BIN_DIR=""
-
-case "$OS" in
-  Darwin)
-    echo "→ Detected macOS"
-    INSTALL_DIR="$HOME/.clawmetry"
-    BIN_DIR="$HOME/.local/bin"
-    USE_SUDO=""
-
-    # Ensure python3 is available
-    if ! command -v python3 &>/dev/null; then
-      if command -v brew &>/dev/null; then
-        echo "→ Installing Python via Homebrew..."
-        brew install python3
-      else
-        echo "❌ Python3 not found. Install it with: brew install python3"
-        echo "   (Get Homebrew: https://brew.sh)"
-        exit 1
-      fi
-    fi
-    ;;
-  Linux)
-    echo "→ Detected Linux"
-    INSTALL_DIR="/opt/clawmetry"
-    BIN_DIR="/usr/local/bin"
-    USE_SUDO="sudo"
-
-    # Install python3-venv if needed
-    if command -v apt-get &>/dev/null; then
-      echo "→ Installing Python venv (apt)..."
-      sudo apt-get update -qq && sudo apt-get install -y -qq python3-venv python3-pip >/dev/null 2>&1
-    elif command -v yum &>/dev/null; then
-      echo "→ Installing Python venv (yum)..."
-      sudo yum install -y python3 python3-pip >/dev/null 2>&1
-    elif command -v dnf &>/dev/null; then
-      echo "→ Installing Python venv (dnf)..."
-      sudo dnf install -y python3 python3-pip >/dev/null 2>&1
-    elif command -v apk &>/dev/null; then
-      echo "→ Installing Python venv (apk)..."
-      sudo apk add python3 py3-pip >/dev/null 2>&1
-    elif command -v pacman &>/dev/null; then
-      echo "→ Installing Python venv (pacman)..."
-      sudo pacman -Sy --noconfirm python python-pip >/dev/null 2>&1
-    fi
-    ;;
-  *)
-    echo "❌ Unsupported OS: $OS"
-    echo "   Clawmetry supports macOS and Linux."
-    echo "   On Windows, use WSL2: https://docs.microsoft.com/en-us/windows/wsl/"
-    exit 1
-    ;;
-esac
-
-# Create isolated venv (remove old one to ensure clean state)
-echo "→ Creating virtual environment at $INSTALL_DIR..."
-$USE_SUDO rm -rf "$INSTALL_DIR"
-$USE_SUDO python3 -m venv "$INSTALL_DIR"
-$USE_SUDO "$INSTALL_DIR/bin/pip" install --upgrade pip >/dev/null 2>&1
-
-# Install clawmetry
-echo "→ Installing clawmetry from PyPI..."
-$USE_SUDO "$INSTALL_DIR/bin/pip" install --no-cache-dir --upgrade clawmetry >/dev/null 2>&1
-
-# Create symlink for easy access
-mkdir -p "$BIN_DIR" 2>/dev/null || $USE_SUDO mkdir -p "$BIN_DIR"
-$USE_SUDO ln -sf "$INSTALL_DIR/bin/clawmetry" "$BIN_DIR/clawmetry"
-
-# Ensure BIN_DIR is in PATH (macOS ~/.local/bin may not be)
-if [ "$OS" = "Darwin" ] && [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
-  echo ""
-  echo "⚠️  Add $BIN_DIR to your PATH:"
-  SHELL_NAME="$(basename "$SHELL")"
-  case "$SHELL_NAME" in
-    zsh)  echo "    echo 'export PATH=\"$BIN_DIR:\$PATH\"' >> ~/.zshrc && source ~/.zshrc" ;;
-    bash) echo "    echo 'export PATH=\"$BIN_DIR:\$PATH\"' >> ~/.bashrc && source ~/.bashrc" ;;
-    *)    echo "    export PATH=\"$BIN_DIR:\$PATH\"" ;;
-  esac
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "❌ Python 3 is required but was not found."
+  exit 1
 fi
 
-# Detect OpenClaw workspace
-WORKSPACE=""
-if [ -d "$HOME/.openclaw" ]; then
-  WORKSPACE="$HOME/.openclaw"
-elif [ -d "/root/.openclaw" ]; then
-  WORKSPACE="/root/.openclaw"
-else
-  # Check Docker-style paths: /docker/openclaw-*/data/.openclaw
-  DOCKER_WS=$(find /docker -maxdepth 4 -name ".openclaw" -type d 2>/dev/null | head -1)
-  if [ -n "$DOCKER_WS" ]; then
-    WORKSPACE="$DOCKER_WS"
+if [[ -z "$VERSION" && -z "$REF" ]]; then
+  echo "→ Resolving latest release tag from GitHub..."
+  VERSION="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)"
+  if [[ -z "$VERSION" ]]; then
+    echo "❌ Could not resolve latest release tag."
+    echo "   Set CLAWTELEMETRY_VERSION=<tag> or CLAWTELEMETRY_REF=<branch-or-sha> and retry."
+    exit 1
   fi
 fi
 
-CLAWMETRY_BIN="$BIN_DIR/clawmetry"
-if ! command -v clawmetry &>/dev/null; then
-  CLAWMETRY_BIN="$INSTALL_DIR/bin/clawmetry"
-fi
+TMP_DIR="$(mktemp -d)"
+ARCHIVE_PATH="$TMP_DIR/clawtelemetry.tar.gz"
 
-VERSION=$("$CLAWMETRY_BIN" --version 2>/dev/null || echo 'installed')
-
-echo ""
-echo "✅ ClawMetry $VERSION installed successfully!"
-echo ""
-
-if [ -n "$WORKSPACE" ]; then
-  echo "  OpenClaw workspace detected: $WORKSPACE"
+if [[ -n "$REF" ]]; then
+  echo "→ Installing from ref: $REF"
+  ARCHIVE_URL="https://github.com/${REPO}/archive/${REF}.tar.gz"
 else
-  echo "  ⚠️  No OpenClaw workspace found. Make sure OpenClaw is installed and running."
+  ARCHIVE_URL="https://github.com/${REPO}/archive/refs/tags/${VERSION}.tar.gz"
+  echo "→ Installing from release tag: $VERSION"
+fi
+
+echo "→ Downloading source archive..."
+if [[ -n "$REF" ]]; then
+  # GitHub supports SHA refs at /archive/<sha>.tar.gz and branches at
+  # /archive/refs/heads/<branch>.tar.gz. Try both for reliability.
+  if ! curl -fsSL "$ARCHIVE_URL" -o "$ARCHIVE_PATH"; then
+    ALT_ARCHIVE_URL="https://github.com/${REPO}/archive/refs/heads/${REF}.tar.gz"
+    curl -fsSL "$ALT_ARCHIVE_URL" -o "$ARCHIVE_PATH"
+  fi
+else
+  curl -fsSL "$ARCHIVE_URL" -o "$ARCHIVE_PATH"
+fi
+
+echo "→ Extracting archive..."
+tar -xzf "$ARCHIVE_PATH" -C "$TMP_DIR"
+SRC_DIR="$(find "$TMP_DIR" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+if [[ -z "$SRC_DIR" ]]; then
+  echo "❌ Failed to locate extracted source directory."
+  exit 1
+fi
+
+echo "→ Creating virtual environment at $INSTALL_DIR"
+rm -rf "$INSTALL_DIR"
+python3 -m venv "$INSTALL_DIR"
+"$INSTALL_DIR/bin/pip" install --upgrade pip >/dev/null
+
+echo "→ Installing ClawTelemetry from local source archive"
+"$INSTALL_DIR/bin/pip" install --no-cache-dir "$SRC_DIR" >/dev/null
+
+mkdir -p "$BIN_DIR"
+ln -sf "$INSTALL_DIR/bin/clawtelemetry" "$BIN_DIR/clawtelemetry"
+
+if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
+  echo ""
+  echo "⚠️  Add $BIN_DIR to your PATH if needed:"
+  echo "   export PATH=\"$BIN_DIR:\$PATH\""
 fi
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ ClawTelemetry installed successfully"
 echo ""
+echo "  Run:"
+echo "    clawtelemetry --host 0.0.0.0 --port 8900"
+echo ""
+echo "  Docs: https://github.com/plgonzalezrx8/clawtelemetry/tree/main/docs"
 
-echo "  Run with:"
-echo ""
-echo "    clawmetry --host 0.0.0.0 --port 8900          # foreground (LAN accessible)"
-echo "    clawmetry start --host 0.0.0.0 --port 8900    # background service (LAN accessible)"
-echo ""
-echo "  Docs: https://clawmetry.com/how-it-works"
-echo ""
-echo "🦞 Happy observing!"
+rm -rf "$TMP_DIR"

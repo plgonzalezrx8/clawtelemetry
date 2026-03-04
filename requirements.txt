@@ -6,6 +6,6 @@ pytest-playwright>=0.5
 requests>=2.28
 
 # Optional: enables real-time OTLP metrics from OpenClaw
-# Install with: pip install clawmetry[otel]
+# Optional OTLP deps: pip install opentelemetry-proto protobuf
 # opentelemetry-proto>=1.20.0
 # protobuf>=4.21.0
