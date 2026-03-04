@@ -76,7 +76,8 @@ jobs:
           $ready = $false
           for ($i = 0; $i -lt 30; $i++) {
             try {
-              $r = Invoke-WebRequest -Uri "http://localhost:8900/api/health" -Headers @{"Authorization"="Bearer ci-test-token"} -UseBasicParsing -ErrorAction Stop
+              # Bound request latency so the readiness loop cannot hang on transient socket stalls.
+              $r = Invoke-WebRequest -Uri "http://localhost:8900/api/health" -Headers @{"Authorization"="Bearer ci-test-token"} -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
               if ($r.StatusCode -eq 200) { $ready = $true; break }
             } catch {}
             Start-Sleep 1
