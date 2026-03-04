@@ -15789,13 +15789,31 @@ def _run_server(args):
 
     local_ip = get_local_ip()
     public_ip = get_public_ip()
-    _safe_print(f"  -> http://localhost:{args.port}")
-    if local_ip != '127.0.0.1':
-        _safe_print(f"  -> http://{local_ip}:{args.port}  (LAN)")
-    if public_ip and public_ip != local_ip:
-        _safe_print(f"  -> http://{public_ip}:{args.port}  (Public - ensure port is open)")
+
+    # Startup URLs should reflect the actual bind host so operators are not
+    # told LAN is reachable when the process is loopback-only.
+    bind_host_raw = (args.host or '').strip()
+    bind_host = bind_host_raw.lower()
+    host_is_loopback = bind_host in ('127.0.0.1', 'localhost', '::1')
+    host_is_any = bind_host in ('0.0.0.0', '::')
+
+    if host_is_any:
+        _safe_print(f"  -> http://localhost:{args.port}")
+        if local_ip != '127.0.0.1':
+            _safe_print(f"  -> http://{local_ip}:{args.port}  (LAN)")
+        if public_ip and public_ip != local_ip:
+            _safe_print(f"  -> http://{public_ip}:{args.port}  (Public - ensure port is open)")
+        otlp_host = local_ip if local_ip != '127.0.0.1' else 'localhost'
+    elif host_is_loopback:
+        _safe_print(f"  -> http://localhost:{args.port}")
+        _safe_print("  -> LAN disabled (bound to loopback). Use --host 0.0.0.0 for LAN access.")
+        otlp_host = 'localhost'
+    else:
+        _safe_print(f"  -> http://{bind_host_raw}:{args.port}  (Bound host)")
+        otlp_host = bind_host_raw
+
     if _HAS_OTEL_PROTO:
-        _safe_print(f"  -> OTLP endpoint: http://{local_ip}:{args.port}/v1/metrics")
+        _safe_print(f"  -> OTLP endpoint: http://{otlp_host}:{args.port}/v1/metrics")
     _safe_print()
     if not args.debug:
         _safe_print(f"  Tip: run as background service with: clawtelemetry start")
@@ -15928,16 +15946,8 @@ def main():
     elif args.command == 'uninstall':
         cmd_uninstall(args)
     else:
-        # No subcommand -> foreground server (original behaviour)
-        try:
-            print(ARCHITECTURE_OVERVIEW.format(version=__version__, port=args.port))
-        except (ValueError, OSError):
-            pass
-        try:
-            print("Starting dashboard...")
-            print()
-        except (ValueError, OSError):
-            pass
+        # No subcommand -> foreground server. _run_server already prints the
+        # launch summary, so avoid duplicate startup banners here.
         _run_server(args)
 
 
