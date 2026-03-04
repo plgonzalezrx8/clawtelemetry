@@ -70,10 +70,17 @@ DEV-DOCS/
 - Build notes: [../BUILD_STATUS.md](../BUILD_STATUS.md)
 - Upcoming ideas: [../UPCOMING.md](../UPCOMING.md)
 
+## Branch Model
+- `main`: production branch.
+- `development`: integration branch for ongoing work.
+- feature branches: cut from `development`, merge back to `development`, then promoted to `main`.
+
 ## Maintenance Rules
 - Update docs in the same change as code changes that affect behavior.
 - Keep findings evidence-backed. Link report artifacts under `reports/`.
 - Do not move or remove root docs unless explicitly planned.
+- Keep `DEV-DOCS/reports/` artifacts immutable; add new snapshots instead of rewriting command output history.
+- Use `DEVELOPMENT-STATUS.md` and `work-log.md` for current-state deltas after baseline audits.
 - Follow the finding schema from `audit/00_AUDIT_SCOPE_AND_METHOD.md`.
 
 ## Documentation Contract

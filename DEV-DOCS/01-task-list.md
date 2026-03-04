@@ -15,11 +15,16 @@
 - [x] TSK-301 Replace PyPI publish flow with GitHub Release assets workflow
 - [x] TSK-302 Rewrite install scripts for GitHub archive/tag installation
 - [x] TSK-303 Add CI guard to block legacy brand token reintroduction
+- [x] TSK-304 Fix duplicate startup summary in debug reloader and align network binding launch hints
+- [x] TSK-305 Add built-in version check loop (startup + 24h cadence) and cached update state
+- [x] TSK-306 Add Overview update notice and `clawtelemetry update` CLI command
+- [x] TSK-307 Align branch model (`main` + `development`) and CI trigger coverage
 
 ## Backlog
 - [ ] TSK-200 Add automated comment-density check integrated with CI (non-blocking first)
 - [ ] TSK-201 Add endpoint contract test for all registered Flask routes
 - [ ] TSK-202 Add benchmark script for memory/CPU profile on long-running dashboard sessions
+- [ ] TSK-203 Add release-install-update end-to-end smoke test from latest GitHub release artifact
 
 ## Blockers
-- None for docs/audit phase.
+- None currently.

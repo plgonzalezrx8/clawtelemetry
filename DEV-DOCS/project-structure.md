@@ -6,7 +6,7 @@ clawtelemetry/
 ├── history.py                    # Optional local history collector (SQLite)
 ├── clawtelemetry/
 │   ├── __init__.py               # package version + main delegation
-│   ├── cli.py                    # console command handlers (start/stop/status/connect)
+│   ├── cli.py                    # wrapper CLI (connect/disconnect/status) + delegation to dashboard main
 │   ├── sync.py                   # cloud sync daemon and encryption pipeline
 │   ├── config.py                 # config dataclass (partial migration scaffold)
 │   ├── extensions.py             # plugin event registry
@@ -15,6 +15,8 @@ clawtelemetry/
 │       ├── local.py              # filesystem-backed provider
 │       ├── turso.py              # cloud provider implementation
 │       └── __init__.py           # provider registry/bootstrap
+├── scripts/
+│   └── check_dashboard_duplicates.py  # static guard for duplicate top-level definitions
 ├── tests/
 │   ├── conftest.py               # server bootstrap fixtures
 │   ├── test_api.py               # API contract checks
@@ -28,8 +30,9 @@ clawtelemetry/
 ```
 
 ## Ownership Boundaries
-- runtime behavior: `dashboard.py`
+- runtime behavior and embedded frontend: `dashboard.py`
 - optional history persistence: `history.py`
-- cloud and provider extensions: `clawtelemetry/`
+- cloud sync and provider extensions: `clawtelemetry/`
+- static guards and local automation scripts: `scripts/`
 - verification and regressions: `tests/` + `.github/workflows/`
-- internal engineering knowledge: `DEV-DOCS/`
+- internal engineering knowledge and status tracking: `DEV-DOCS/`
