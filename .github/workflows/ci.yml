@@ -73,15 +73,15 @@ jobs:
           $env:OPENCLAW_GATEWAY_TOKEN = "ci-test-token"
           $env:PYTHONIOENCODING = "utf-8"
           $env:PYTHONUTF8 = "1"
-          # Use a detached process without output redirection to avoid occasional
-          # Windows runner hangs when Start-Process is combined with redirection.
-          $proc = Start-Process python -ArgumentList "-u -X utf8 dashboard.py --port 8900 --no-debug" -PassThru
+          # Start via cmd and redirect logs inside cmd so we keep diagnostics
+          # without using Start-Process native redirection flags.
+          $proc = Start-Process cmd -ArgumentList "/c python -u -X utf8 dashboard.py --port 8900 --no-debug > server_out.txt 2> server_err.txt" -PassThru
           Write-Host "Started dashboard process pid=$($proc.Id)"
           $ready = $false
           for ($i = 0; $i -lt 30; $i++) {
             try {
-              # Bound request latency so the readiness loop cannot hang on transient socket stalls.
-              $r = Invoke-WebRequest -Uri "http://localhost:8900/api/health" -Headers @{"Authorization"="Bearer ci-test-token"} -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
+              # Probe a lightweight endpoint that is always public and fast.
+              $r = Invoke-WebRequest -Uri "http://localhost:8900/api/auth/check" -UseBasicParsing -TimeoutSec 8 -ErrorAction Stop
               if ($r.StatusCode -eq 200) { $ready = $true; break }
             } catch {}
             Start-Sleep 1
@@ -89,6 +89,14 @@ jobs:
           if (-not $ready) {
             Write-Host "Dashboard process status:"
             Get-Process -Id $proc.Id -ErrorAction SilentlyContinue | Format-List -Property Id,ProcessName,StartTime
+            if (Test-Path server_out.txt) {
+              Write-Host "=== server_out.txt ==="
+              Get-Content server_out.txt -Tail 200
+            }
+            if (Test-Path server_err.txt) {
+              Write-Host "=== server_err.txt ==="
+              Get-Content server_err.txt -Tail 200
+            }
             Write-Error "Server failed to start"; exit 1
           }
         shell: pwsh
